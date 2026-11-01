@@ -28,6 +28,11 @@ targets:
       path: Shepherdr/Info.plist
       properties:
         CFBundleDisplayName: Shepherdr
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        # Only HTTPS/TLS (exempt): skips the export-compliance prompt on upload.
+        ITSAppUsesNonExemptEncryption: false
+        LSApplicationCategoryType: public.app-category.developer-tools
         NSCameraUsageDescription: Scan the pairing QR code your hub shows.
         UILaunchScreen: {}
         UIBackgroundModes: [remote-notification]

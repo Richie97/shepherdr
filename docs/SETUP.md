@@ -129,6 +129,21 @@ Command-line build, if you prefer:
 xcodebuild -scheme Shepherdr -destination 'id=<device-udid>' -allowProvisioningUpdates -skipPackagePluginValidation build
 ```
 
+### TestFlight (optional)
+
+To install through TestFlight instead of Xcode:
+
+1. **Create the app record:** App Store Connect → Apps → **+** → New App. Choose iOS, your bundle ID, any name and SKU.
+2. **Give the upload tools access** in one of two ways:
+   - Sign in to Xcode with your Apple ID (Xcode → Settings → Accounts).
+   - Or create an App Store Connect API key (Users and Access → Integrations → Team Keys, role App Manager) and export `ASC_KEY_PATH`, `ASC_KEY_ID` and `ASC_ISSUER_ID`.
+3. **Upload:** run `ios/scripts/testflight.sh`. It archives a Release build with a timestamp build number and uploads it. Use `--no-upload` to only archive.
+4. **Install:** in App Store Connect → TestFlight, add yourself to an **internal** testing group and install from the TestFlight app.
+
+Notes:
+- External testers need Beta App Review, and reviewers can't reach your tailnet.
+- TestFlight builds use Apple's production push service. The same `.p8` key works, and the app tells the bridge which service to use.
+
 ## 5. Pair the phone
 
 With Tailscale on, on the phone:
