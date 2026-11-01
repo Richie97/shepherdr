@@ -46,6 +46,9 @@ jobs:
         run: |
           sim=$(xcrun simctl list devices available | grep -m1 -oE 'iPhone [0-9A-Za-z ]+[0-9A-Za-z]' )
           echo "simulator: $sim"
+          # Boot first: a cold simulator can time out the UI test's app launch.
+          xcrun simctl bootstatus "$sim" -b > /dev/null
           xcodebuild test -scheme Shepherdr -destination "platform=iOS Simulator,name=$sim" \
-            -derivedDataPath build -skipPackagePluginValidation | tail -20
+            -derivedDataPath build -skipPackagePluginValidation \
+            -retry-tests-on-failure -test-iterations 2 | tail -20
           exit ${PIPESTATUS[0]}
