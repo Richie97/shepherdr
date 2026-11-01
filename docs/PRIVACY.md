@@ -33,4 +33,4 @@ Shepherdr is a developer tool and isn't directed at children.
 
 ## Changes and contact
 
-Changes to this policy are published at this address, and the history is in the project's repository. For questions, open an issue at <https://github.com/Richie97/herdr-ui/issues>.
+Changes to this policy are published at this address, and the history is in the project's repository. For questions, open an issue at <https://github.com/Richie97/shepherdr/issues>.

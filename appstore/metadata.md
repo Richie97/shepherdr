@@ -23,7 +23,7 @@ The app icon comes from the build, so there's nothing to upload.
 | **Secondary category** | Productivity |
 | **Content rights** | Does not contain, show or access third-party content |
 | **Age rating** | Answer **None / No** to every question → **4+** (links open in Safari; there's no in-app browser) |
-| **Privacy Policy URL** | https://github.com/Richie97/herdr-ui/blob/main/docs/PRIVACY.md |
+| **Privacy Policy URL** | https://github.com/Richie97/shepherdr/blob/main/docs/PRIVACY.md |
 
 ## App Privacy (App Store Connect → App Privacy)
 
@@ -78,7 +78,7 @@ Shepherdr is a companion app. You'll need:
 • Tailscale on your computers and iPhone
 • herdr-bridge running on one machine (free and open source; setup takes about 15 minutes)
 
-Setup guide: github.com/Richie97/herdr-ui
+Setup guide: github.com/Richie97/shepherdr
 ```
 
 **Keywords** (96/100). Words from the name and subtitle are indexed already, so they aren't repeated. No third-party trademarks, per App Review guideline 2.3.7.
@@ -86,8 +86,8 @@ Setup guide: github.com/Richie97/herdr-ui
 terminal,developer,remote,ssh,cli,llm,devops,monitor,approve,notify,shell,automation,programming
 ```
 
-**Support URL:** https://github.com/Richie97/herdr-ui/issues
-**Marketing URL:** https://github.com/Richie97/herdr-ui
+**Support URL:** https://github.com/Richie97/shepherdr/issues
+**Marketing URL:** https://github.com/Richie97/shepherdr
 **Copyright:** 2026 Eric Richardson
 
 **What's New** (155/4000)
@@ -104,7 +104,7 @@ Shepherdr is a companion app for Herdr (herdr.dev), a terminal workspace for AI 
 
 What reviewers will see without a hub: the Connect screen, which asks for the hub's address or a QR code.
 
-The bridge is free and open source: https://github.com/Richie97/herdr-ui (setup guide in docs/SETUP.md). A screen recording of the app connected to a hub is attached.
+The bridge is free and open source: https://github.com/Richie97/shepherdr (setup guide in docs/SETUP.md). A screen recording of the app connected to a hub is attached.
 
 The app collects no data. Push tokens are sent only to the user's own hub. The camera is used only to scan the pairing QR code. Encryption: HTTPS/TLS only (exempt).
 ```

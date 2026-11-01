@@ -43,7 +43,7 @@ If you add the machines from the Herdr desktop app instead, check with `hc machi
 Clone this repo on a machine with Go:
 
 ```sh
-git clone https://github.com/Richie97/herdr-ui && cd herdr-ui/bridge
+git clone https://github.com/Richie97/shepherdr && cd shepherdr/bridge
 go test ./...
 ```
 
@@ -61,7 +61,7 @@ go build -o ~/.local/bin/herdr-bridge ./cmd/herdr-bridge
 **Option 1: on the Windows machine** (with Go installed):
 
 ```powershell
-cd herdr-ui\bridge
+cd shepherdr\bridge
 go build -trimpath -ldflags "-s -w -H=windowsgui" -o herdr-bridge.new.exe .\cmd\herdr-bridge
 .\herdr-bridge.new.exe install
 ```
