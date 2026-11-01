@@ -35,7 +35,10 @@ struct ShepherdrApp: App {
             Group {
                 #if DEBUG
                 if DemoData.isOn {
-                    AgentsView().onAppear { store.load(DemoData.terminals, health: DemoData.health) }
+                    AgentsView().onAppear {
+                        store.load(DemoData.terminals, health: DemoData.health)
+                        DemoData.applyOrientation()
+                    }
                 } else { normalRoot }
                 #else
                 normalRoot

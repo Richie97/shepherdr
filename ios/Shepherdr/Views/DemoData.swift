@@ -1,11 +1,19 @@
 #if DEBUG
-import Foundation
+import UIKit
 
 /// Made-up agents for App Store screenshots: launch with `-demo YES`.
 /// No hub is contacted.
 @MainActor
 enum DemoData {
     static var isOn: Bool { UserDefaults.standard.bool(forKey: "demo") }
+
+    /// `-landscape YES` rotates the window, so a Pro Max simulator shows the
+    /// regular-width (split view) layout an unfolded iPhone Duo gets.
+    static func applyOrientation() {
+        guard UserDefaults.standard.bool(forKey: "landscape"),
+              let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+        scene.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight)) { _ in }
+    }
 
     private static let now = Int64(Date().timeIntervalSince1970 * 1000)
 

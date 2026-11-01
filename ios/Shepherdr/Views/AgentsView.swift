@@ -1,68 +1,32 @@
 import SwiftUI
 
 /// Home: every agent on every machine, most urgent first.
+///
+/// Adapts to the width it gets: a list that pushes an agent on phones and the
+/// folded iPhone Duo, and a list + agent split view when there's room (the
+/// unfolded Duo, landscape Pro Max). Both share one selection, so folding or
+/// unfolding keeps the open agent.
 struct AgentsView: View {
     @Environment(HerdrStore.self) private var store
+    @Environment(\.horizontalSizeClass) private var sizeClass
     @AppStorage("showShells") private var showShells = false
     @State private var showSettings = false
     @State private var showNewAgent = false
-    @State private var path: [String] = []
+    /// The open agent (compact) or the selected one (split).
+    @State private var selected: String?
+
+    private var isSplit: Bool { sizeClass == .regular }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            List {
-                ConnectionBanner()
-                ForEach(store.unavailableMachines) { m in MachineDownRow(machine: m) }
-                ForEach(AgentState.allCases, id: \.self) { state in
-                    let agents = store.agents(in: state)
-                    if !agents.isEmpty {
-                        Section {
-                            ForEach(agents) { t in
-                                NavigationLink(value: t.address) { AgentRow(terminal: t) }
-                            }
-                        } header: {
-                            Label(state.title, systemImage: state.symbol)
-                                .foregroundStyle(state.color)
-                        }
-                    }
-                }
-                if showShells, !store.shells.isEmpty {
-                    Section("Terminals") {
-                        ForEach(store.shells) { t in
-                            NavigationLink(value: t.address) { AgentRow(terminal: t) }
-                        }
-                    }
-                }
-                if store.connection == .live, store.terminals.values.allSatisfy({ !$0.isLive || !$0.isAgent }) {
-                    ContentUnavailableView("No agents running", systemImage: "terminal",
-                                           description: Text("Agents started in Herdr on any machine show up here."))
-                }
-            }
-            .navigationTitle("Agents")
-            .navigationDestination(for: String.self) { AgentDetailView(address: $0) }
-            .refreshable { await store.resync() }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Toggle(isOn: $showShells) { Image(systemName: "apple.terminal") }
-                        .toggleStyle(.button)
-                        .accessibilityLabel("Show terminals without agents")
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showSettings = true } label: { Image(systemName: "gearshape") }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showNewAgent = true } label: { Image(systemName: "plus") }
-                        .accessibilityLabel("New agent")
-                        .disabled(store.connection != .live)
-                }
-            }
-            .sheet(isPresented: $showSettings) { SettingsView() }
-            .sheet(isPresented: $showNewAgent) { NewAgentView() }
+        Group {
+            if isSplit { split } else { stack }
         }
+        .sheet(isPresented: $showSettings) { SettingsView() }
+        .sheet(isPresented: $showNewAgent) { NewAgentView() }
         #if DEBUG
         .task {
             // `simctl launch <app> -openTerminal simrig/t9`, for screenshots.
-            if let a = UserDefaults.standard.string(forKey: "openTerminal"), path.isEmpty { path = [a] }
+            if let a = UserDefaults.standard.string(forKey: "openTerminal"), selected == nil { selected = a }
             if UserDefaults.standard.bool(forKey: "openNewAgent") {
                 try? await Task.sleep(for: .seconds(2)) // let the snapshot arrive
                 showNewAgent = true
@@ -72,15 +36,96 @@ struct AgentsView: View {
         .task {
             // A link or notification that arrived before this view existed.
             if let address = AppRouter.shared.pendingAddress {
-                path = [address]
+                selected = address
                 AppRouter.shared.pendingAddress = nil
             }
         }
         .onChange(of: AppRouter.shared.pendingAddress) { _, address in
             // A tapped notification or shepherdr://terminal link.
             guard let address else { return }
-            path = [address]
+            selected = address
             AppRouter.shared.pendingAddress = nil
+        }
+    }
+
+    // MARK: Layouts
+
+    private var stack: some View {
+        NavigationStack(path: Binding(get: { selected.map { [$0] } ?? [] }, set: { selected = $0.last })) {
+            agentList
+                .navigationDestination(for: String.self) { AgentDetailView(address: $0) }
+        }
+    }
+
+    private var split: some View {
+        NavigationSplitView {
+            agentList
+                .navigationSplitViewColumnWidth(min: 300, ideal: 360, max: 440)
+        } detail: {
+            // Its own stack, so the agent can push its live terminal.
+            NavigationStack {
+                if let selected {
+                    AgentDetailView(address: selected).id(selected)
+                } else {
+                    ContentUnavailableView("No agent selected", systemImage: "sidebar.left",
+                                           description: Text("Pick an agent to see its screen."))
+                }
+            }
+        }
+        .onAppear { if selected == nil { selected = mostUrgent } }
+        .onChange(of: store.terminals.count) { if selected == nil { selected = mostUrgent } }
+    }
+
+    /// The agent to show first when there's room for a detail column.
+    private var mostUrgent: String? {
+        AgentState.allCases.lazy.compactMap { store.agents(in: $0).first?.address }.first
+    }
+
+    private var agentList: some View {
+        List(selection: isSplit ? $selected : .constant(nil)) {
+            ConnectionBanner()
+            ForEach(store.unavailableMachines) { m in MachineDownRow(machine: m) }
+            ForEach(AgentState.allCases, id: \.self) { state in
+                let agents = store.agents(in: state)
+                if !agents.isEmpty {
+                    Section {
+                        ForEach(agents) { t in
+                            NavigationLink(value: t.address) { AgentRow(terminal: t) }
+                        }
+                    } header: {
+                        Label(state.title, systemImage: state.symbol)
+                            .foregroundStyle(state.color)
+                    }
+                }
+            }
+            if showShells, !store.shells.isEmpty {
+                Section("Terminals") {
+                    ForEach(store.shells) { t in
+                        NavigationLink(value: t.address) { AgentRow(terminal: t) }
+                    }
+                }
+            }
+            if store.connection == .live, store.terminals.values.allSatisfy({ !$0.isLive || !$0.isAgent }) {
+                ContentUnavailableView("No agents running", systemImage: "terminal",
+                                       description: Text("Agents started in Herdr on any machine show up here."))
+            }
+        }
+        .navigationTitle("Agents")
+        .refreshable { await store.resync() }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Toggle(isOn: $showShells) { Image(systemName: "apple.terminal") }
+                    .toggleStyle(.button)
+                    .accessibilityLabel("Show terminals without agents")
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showSettings = true } label: { Image(systemName: "gearshape") }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showNewAgent = true } label: { Image(systemName: "plus") }
+                    .accessibilityLabel("New agent")
+                    .disabled(store.connection != .live)
+            }
         }
     }
 
