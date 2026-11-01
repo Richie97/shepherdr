@@ -88,7 +88,9 @@ def q(params: dict) -> str:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--build", required=True, help="CFBundleVersion of the uploaded build")
+    ap.add_argument("--build", help="CFBundleVersion of the uploaded build")
+    ap.add_argument("--check", action="store_true",
+                    help="only verify the API key can see the app (preflight before archiving)")
     ap.add_argument("--bundle-id", default="app.shepherdr")
     ap.add_argument("--group", default="Internal")
     ap.add_argument("--notes-file", help="What to Test text (max 4000 chars)")
@@ -100,6 +102,13 @@ def main():
     if not apps:
         raise SystemExit(f"No App Store Connect app with bundle ID {a.bundle_id}")
     app_id = apps[0]["id"]
+    if a.check:
+        groups = asc.call("GET", f"/v1/apps/{app_id}/betaGroups" + q({"fields[betaGroups]": "name", "limit": 200}))["data"]
+        print(f'API key OK: app "{apps[0]["attributes"]["name"]}" ({a.bundle_id}), TestFlight groups: '
+              + (", ".join(g["attributes"]["name"] for g in groups) or "none"))
+        return
+    if not a.build:
+        ap.error("--build is required")
 
     # The build shows up a few minutes after upload, then processes.
     deadline = time.time() + a.timeout
