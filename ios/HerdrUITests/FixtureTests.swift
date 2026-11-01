@@ -46,6 +46,19 @@ struct FixtureTests {
         #expect(!NewAgentView.isValidName("Bad Name"))
     }
 
+    @Test func flagsTerminalsOnUnavailableMachines() throws {
+        let health = try JSONDecoder().decode(Health.self, from: Data(#"""
+        {"bridge_version":"t","core":{"core":{"id":"x","name":"devbox"},"version":"0.1.16"},
+         "machines":{"machines":[{"name":"laptop","state":"needs_login"},{"name":"nas","state":"connected"}]}}
+        """#.utf8))
+        let store = HerdrStore()
+        store.load([Terminal(address: "laptop/t3"), Terminal(address: "nas/t1"), Terminal(address: "t9")], health: health)
+        #expect(store.unavailableMachines.map(\.name) == ["laptop"])
+        #expect(!store.isReachable(Terminal(address: "laptop/t3")))
+        #expect(store.isReachable(Terminal(address: "nas/t1")))
+        #expect(store.isReachable(Terminal(address: "t9")))
+    }
+
     @Test func appliesRecordedEventStream() throws {
         let lines = try String(decoding: fixture("events.subscribe.jsonl"), as: UTF8.self)
             .split(separator: "\n").map { Data($0.utf8) }

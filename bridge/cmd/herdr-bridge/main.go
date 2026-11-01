@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"herdr-ui/bridge/internal/core"
+	"herdr-ui/bridge/internal/machines"
 	"herdr-ui/bridge/internal/pair"
 	"herdr-ui/bridge/internal/push"
 	"herdr-ui/bridge/internal/server"
@@ -151,6 +152,7 @@ func serve(args []string) error {
 	defer stop()
 	watcher := &push.Watcher{Core: client, Notify: pusher.Alert, Logger: log, Cooldown: 20 * time.Second}
 	go watcher.Run(ctx)
+	go (&machines.Healer{Core: client, Logger: log}).Run(ctx)
 	go func() {
 		<-ctx.Done()
 		sctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

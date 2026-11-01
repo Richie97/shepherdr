@@ -199,6 +199,7 @@ Apps installed from Xcode use Apple's development push service. The app tells th
 | `403 forbidden` | The phone is signed into a different Tailscale user than the hub, or the hub is a tagged node (no user). Pass `-owner you@example.com` to `serve` if needed. |
 | `/v1/health` shows `core_error` | Herdr isn't running on the hub. Start the Herdr app or `hc server start`. |
 | Agents from another machine missing | The hub's core hasn't added that machine (`hc machine ls`), or it's asleep. |
+| "<machine> is unavailable" / "needs login" | The hub's ssh to that machine wanted an interactive login. With Tailscale SSH this usually means the rule uses `"action": "check"`, which re-asks every ~12 h. Switch that rule to `"accept"`, or use regular sshd with a key. The bridge retries such machines every 1–15 minutes, and the app has a **Reconnect** button. |
 | No notifications | Check `"push_enabled"` in `/v1/health`, then Settings → **Send test notification**, which reports Apple's error. `DeviceTokenNotForTopic` means `topic` ≠ the bundle ID. |
 | Windows bridge not running after reboot | It starts at **logon**, so someone has to sign in to Windows. The log is `%LOCALAPPDATA%\Programs\herdr-bridge\herdr-bridge.log`. |
 | Can't replace the bridge on Windows | A running `.exe` can't be overwritten. Always install from `herdr-bridge.new.exe`; the deploy script does this for you. |

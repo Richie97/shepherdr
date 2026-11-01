@@ -12,6 +12,7 @@ struct AgentsView: View {
         NavigationStack(path: $path) {
             List {
                 ConnectionBanner()
+                ForEach(store.unavailableMachines) { m in MachineDownRow(machine: m) }
                 ForEach(AgentState.allCases, id: \.self) { state in
                     let agents = store.agents(in: state)
                     if !agents.isEmpty {
@@ -122,6 +123,44 @@ struct AgentRow: View {
             }
         }
         .padding(.vertical, 2)
+        .opacity(store.isReachable(terminal) ? 1 : 0.45)
+    }
+}
+
+/// A machine the hub can't reach right now, with a way to redial it.
+struct MachineDownRow: View {
+    @Environment(HerdrStore.self) private var store
+    let machine: Machine
+    @State private var busy = false
+    @State private var error: String?
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "bolt.horizontal.circle").foregroundStyle(.orange).padding(.top, 2)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(machine.name) is unavailable").font(.subheadline.weight(.semibold))
+                Text(error ?? Self.explain(machine.state)).font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button {
+                busy = true
+                Task {
+                    defer { busy = false }
+                    do { try await store.reconnect(machine.name); error = nil } catch { self.error = error.localizedDescription }
+                }
+            } label: {
+                if busy { ProgressView() } else { Text("Reconnect") }
+            }
+            .buttonStyle(.bordered)
+            .disabled(busy)
+        }
+    }
+
+    static func explain(_ state: String) -> String {
+        switch state {
+        case "needs_login": "The hub's ssh login to it needs attention (e.g. a Tailscale SSH re-check). The bridge retries on its own."
+        default: "State: \(state.replacingOccurrences(of: "_", with: " ")). It may be asleep or offline."
+        }
     }
 }
 

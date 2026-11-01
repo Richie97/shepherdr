@@ -39,6 +39,25 @@ struct LiveTerminalView: View {
     }
 
     @ViewBuilder private var banner: some View {
+        if let t = store.terminals[address], !store.isReachable(t), let m = t.machine {
+            VStack(spacing: 8) {
+                Label("\(m) is unavailable", systemImage: "bolt.horizontal.circle")
+                Text(MachineDownRow.explain(store.machineState(m) ?? "")).font(.caption2).multilineTextAlignment(.center)
+                Button("Reconnect") {
+                    Task { try? await store.reconnect(m); connect() }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            .font(.callout)
+            .padding()
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+            .padding()
+        } else {
+            sessionBanner
+        }
+    }
+
+    @ViewBuilder private var sessionBanner: some View {
         switch session.state {
         case .live where watchOnly:
             Label("Watching", systemImage: "eye").bannerStyle()

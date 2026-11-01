@@ -21,6 +21,7 @@ final class HerdrStore {
 
     private(set) var client: BridgeClient?
     private var streamTask: Task<Void, Never>?
+    private var healthTask: Task<Void, Never>?
     private var refreshing: Set<String> = []
     private var backoff: Duration = .seconds(1)
 
@@ -51,11 +52,52 @@ final class HerdrStore {
         let client = BridgeClient(baseURL: url)
         self.client = client
         streamTask = Task { [weak self] in await self?.run(client) }
+        // Machine link states aren't in the event stream; poll them.
+        healthTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(30))
+                await self?.refreshHealth()
+            }
+        }
+    }
+
+    func refreshHealth() async {
+        guard let client, let h = try? await client.health() else { return }
+        health = h
+    }
+
+    /// A machine's link state as seen by the hub (nil for the hub itself).
+    func machineState(_ name: String?) -> String? {
+        guard let name else { return nil }
+        return machines.first { $0.name == name }?.state
+    }
+
+    /// Machines whose link to the hub is down.
+    var unavailableMachines: [Machine] { machines.filter { $0.state != "connected" && $0.state != "connecting" } }
+
+    func isReachable(_ t: Terminal) -> Bool {
+        guard let state = machineState(t.machine) else { return true }
+        return state == "connected"
+    }
+
+    /// Asks the hub to redial a machine (after an ssh re-login, a sleep, …).
+    func reconnect(_ machine: String) async throws {
+        guard let client else { return }
+        struct P: Encodable, Sendable { var machine: String }
+        struct R: Decodable, Sendable { var state: String }
+        let r = try await client.call("machine.connect", P(machine: machine), as: R.self, timeout: 60)
+        await refreshHealth()
+        if r.state != "connected" {
+            throw BridgeError(kind: r.state, message: "\(machine) is still \(r.state.replacingOccurrences(of: "_", with: " "))")
+        }
+        await resync()
     }
 
     func disconnect() {
         streamTask?.cancel()
         streamTask = nil
+        healthTask?.cancel()
+        healthTask = nil
         client = nil
         connection = .disconnected
     }
