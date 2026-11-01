@@ -111,4 +111,3 @@ The core on this Mac runs the user's real agents.
   - Live terminal: SwiftTerm over `/v1/attach`, using the framed protocol (docs/protocol.md).
   - New agent: `/v1/start` runs a kept shell labeled `herdr.space`/`herdr.tab` and types the agent command, the same way the Herdr app does. A task is delivered once the agent reports idle.
   - Pairing: `herdr-bridge pair` (terminal QR), the `/pair` page, `shepherdr://pair?hub=` links, and the in-app scanner (VisionKit). The QR encoder is `rsc.io/qr`, approved by the user.
-- Before pushing to GitHub: `bridge/testdata` still has real paths, hosts and titles. Decide whether to scrub it.
