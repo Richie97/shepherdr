@@ -138,7 +138,7 @@ To install through TestFlight instead of Xcode:
    - Sign in to Xcode with your Apple ID (Xcode → Settings → Accounts).
    - Or create an App Store Connect API key (Users and Access → Integrations → Team Keys, role App Manager) and export `ASC_KEY_PATH`, `ASC_KEY_ID` and `ASC_ISSUER_ID`.
 3. **Upload:** run `ios/scripts/testflight.sh`. It archives a Release build with a timestamp build number and uploads it. Use `--no-upload` to only archive.
-   - **CI instead:** add the API key as repository secrets `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_P8` (the file's full contents). Then `.github/workflows/testflight.yml` uploads a build on every merge to `main` that touches `ios/`, or on demand from the Actions tab. Give the key the **Admin** role, or App Manager with access to certificates, so CI can sign through Apple's cloud signing.
+   - **CI instead:** add the API key as repository secrets `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_P8` (the file's full contents). Then CI tests every push, and when CI passes on `main` with changes under `ios/` since the last upload, `.github/workflows/testflight.yml` archives and uploads a build. You can also run it on demand from the Actions tab. Give the key the **Admin** role, or App Manager with access to certificates, so CI can sign through Apple's cloud signing.
 4. **Install:** in App Store Connect → TestFlight, add yourself to an **internal** testing group and install from the TestFlight app.
 
 Notes:

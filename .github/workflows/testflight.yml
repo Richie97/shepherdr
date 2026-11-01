@@ -1,7 +1,11 @@
 name: TestFlight
 
-# Uploads a build to TestFlight whenever the app changes on main (i.e. on
-# merge), or on demand from the Actions tab.
+# One pipeline: CI tests every push; when CI passes on main and the app
+# changed since the last upload, this archives and uploads to TestFlight.
+# Run it from the Actions tab to upload the current main regardless.
+#
+# The last uploaded commit is marked with the tag `testflight-uploaded`, so a
+# merge of several commits (or a change after a failed upload) still ships.
 #
 # Repository secrets (an App Store Connect API key, role Admin, or App Manager
 # with access to certificates/profiles, so cloud signing can sign the build):
@@ -9,27 +13,63 @@ name: TestFlight
 #   ASC_ISSUER_ID   the issuer ID shown above the keys list
 #   ASC_KEY_P8      the full contents of AuthKey_<id>.p8
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
-    paths:
-      - 'ios/**'
-      - '.github/workflows/testflight.yml'
   workflow_dispatch:
 
 concurrency:
   group: testflight
   cancel-in-progress: false
 
+permissions:
+  contents: write # to move the testflight-uploaded tag
+
 jobs:
-  test:
-    uses: ./.github/workflows/ci.yml
+  gate:
+    name: Decide
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    outputs:
+      upload: ${{ steps.decide.outputs.upload }}
+      sha: ${{ steps.decide.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+      - id: decide
+        run: |
+          sha=$(git rev-parse HEAD)
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual run: uploading $sha"; echo "upload=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if ! git rev-parse -q --verify refs/tags/testflight-uploaded >/dev/null; then
+            echo "No previous upload: uploading $sha"; echo "upload=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          if git diff --quiet testflight-uploaded "$sha" -- ios/; then
+            echo "ios/ unchanged since $(git rev-parse --short testflight-uploaded): skipping"
+            echo "upload=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ios/ changed since $(git rev-parse --short testflight-uploaded):"
+            git diff --stat testflight-uploaded "$sha" -- ios/ | tail -5
+            echo "upload=true" >> "$GITHUB_OUTPUT"
+          fi
 
   upload:
-    needs: test
+    name: Archive and upload
+    needs: gate
+    if: needs.gate.outputs.upload == 'true'
     runs-on: macos-26
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.gate.outputs.sha }}
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
@@ -50,6 +90,10 @@ jobs:
       - name: Remove API key
         if: always()
         run: rm -rf "$RUNNER_TEMP/asc"
+      - name: Mark as uploaded
+        run: |
+          git tag -f testflight-uploaded "${{ needs.gate.outputs.sha }}"
+          git push -f origin refs/tags/testflight-uploaded
       - uses: actions/upload-artifact@v4
         if: always()
         with:

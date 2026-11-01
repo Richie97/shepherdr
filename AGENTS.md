@@ -55,8 +55,9 @@ The core on this Mac runs the user's real agents.
 - Model every identifier as `(machine, address)`.
 - TestFlight: `ios/scripts/testflight.sh` (`--no-upload` only archives). It uses a UTC timestamp build number; bump `MARKETING_VERSION` in project.yml for a new version. Uploading needs an Xcode account or `ASC_KEY_PATH`/`ASC_KEY_ID`/`ASC_ISSUER_ID`.
 - CI (`.github/workflows`):
-  - `ci.yml`: bridge and iOS tests on pull requests and on pushes to main.
-  - `testflight.yml`: tests, then upload. Runs on pushes to main that touch `ios/`, or manually. Needs the secrets `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_P8`.
+  - `ci.yml`: bridge and iOS tests on pull requests and on pushes to main. This is the only place tests run.
+  - `testflight.yml`: starts when CI completes on main (`workflow_run`). It uploads only if CI passed and `ios/` changed since the `testflight-uploaded` tag, then moves the tag. A manual run always uploads. Needs the secrets `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_P8`.
+  - Workflow changes to `workflow_run` workflows only take effect once they're on main.
   - Both use macOS 26 runners with the latest stable Xcode, because SwiftTerm needs Swift 6.2.
 - Generate the project: `cd ios && xcodegen generate`. Test: `xcodebuild -scheme Shepherdr -destination 'platform=iOS Simulator,name=iPhone 17' -derivedDataPath build -skipPackagePluginValidation test`. Tests decode the fixtures in `bridge/testdata`, which are bundled as the `testdata` folder.
 - Bundle ID `app.shepherdr`, team `L3NS86NMXZ`. URL scheme: `shepherdr://terminal/<address>`.
