@@ -14,7 +14,7 @@ here=$(cd "$(dirname "$0")/.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-echo "building…"
+echo "building..."
 (cd "$here" && GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-s -w -H=windowsgui" -o "$work/herdr-bridge.exe" ./cmd/herdr-bridge)
 
 b64() { python3 -I -c 'import json,sys,base64; d=json.load(sys.stdin); sys.stdout.write(base64.b64decode(d.get("stdout","")).decode())'; }
@@ -22,7 +22,7 @@ local_app=$("$hc" exec --on "$machine" --json cmd /c "echo %LOCALAPPDATA%" | b64
 dir="$local_app\\Programs\\herdr-bridge"
 "$hc" exec --on "$machine" --json cmd /c "if not exist \"$dir\" mkdir \"$dir\"" >/dev/null
 
-echo "uploading to $machine:$dir…"
+echo "uploading to $machine:$dir..."
 (cd "$work" && split -b 6000000 herdr-bridge.exe part.)
 for p in "$work"/part.*; do
   "$hc" file write --on "$machine" "$dir\\$(basename "$p")" < "$p" >/dev/null
@@ -33,5 +33,5 @@ remote=$("$hc" exec --on "$machine" --json powershell -NoProfile -Command \
 want=$(shasum -a 256 "$work/herdr-bridge.exe" | cut -d' ' -f1)
 [[ "$remote" == "$want" ]] || { echo "hash mismatch: $remote != $want" >&2; exit 1; }
 
-echo "installing…"
+echo "installing..."
 "$hc" exec --on "$machine" --json "$dir\\herdr-bridge.new.exe" install | b64

@@ -40,7 +40,7 @@ run() {
 }
 
 xcodegen generate -q
-echo "archiving build $build…"
+echo "archiving build ${build}..."
 run "$out/archive.log" archive -scheme Shepherdr -configuration Release \
   -destination 'generic/platform=iOS' -archivePath "$out/Shepherdr.xcarchive" \
   -derivedDataPath build -allowProvisioningUpdates -skipPackagePluginValidation \
@@ -51,7 +51,7 @@ if [[ $upload == 0 ]]; then
   opts="$out/ExportOptions-local.plist"
   sed 's#<string>upload</string>#<string>export</string>#' ExportOptions.plist > "$opts"
 fi
-echo "exporting$([[ $upload == 1 ]] && echo ' and uploading')…"
+echo "exporting$([[ $upload == 1 ]] && echo ' and uploading')..."
 run "$out/export.log" -exportArchive -archivePath "$out/Shepherdr.xcarchive" -exportOptionsPlist "$opts" \
   -exportPath "$out/export" -allowProvisioningUpdates ${auth[@]+"${auth[@]}"}
 
