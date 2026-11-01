@@ -1,0 +1,9 @@
+{
+  "id": 9,
+  "jsonrpc": "2.0",
+  "result": {
+    "complete": true,
+    "how": "history",
+    "text": "Fetched 3 updates.\n==> Upgrading go\n  1.27.2 -> 1.27.3\n==> Pouring go--1.27.3.arm64_sequoia.bottle.tar.gz\n\ud83c\udf7a  /opt/homebrew/Cellar/go/1.27.3: 14,000 files, 280MB\n"
+  }
+}

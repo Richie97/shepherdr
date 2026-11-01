@@ -1,0 +1,648 @@
+{
+  "id": 3,
+  "jsonrpc": "2.0",
+  "result": {
+    "hidden_finished": 0,
+    "machines": [
+      {
+        "host": "devbox",
+        "id": "5d1aff386569fd5a96360077df22d2b8",
+        "name": "devbox",
+        "session": null,
+        "state": "connected",
+        "target": "dev@devbox",
+        "temporary": false,
+        "version": "0.1.16",
+        "via": false
+      }
+    ],
+    "terminals": [
+      {
+        "address": "t1",
+        "argv": [
+          "/bin/zsh",
+          "-l"
+        ],
+        "cols": 216,
+        "created_ms": 1793397620648,
+        "cwd": "/Users/dev",
+        "die_with_parent": false,
+        "exit_code": null,
+        "finished_ms": null,
+        "foreground": {
+          "argv": [
+            "claude"
+          ],
+          "cwd": "/Users/dev/src/webapp",
+          "name": "2.1.314",
+          "pid": 19769
+        },
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "spdb3c431bc19042004ffe674965e62320",
+          "herdr.tab": "tb86408877440bcaaa5d64d408858d990e",
+          "where": "webapp / 1"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 14041,
+        "reason": null,
+        "reported": true,
+        "rm": false,
+        "rows": 46,
+        "screen": "exact",
+        "signal": null,
+        "state": "live",
+        "status": {
+          "app": "claude-code",
+          "state": "done"
+        },
+        "status_ms": 1793398078725,
+        "template": null,
+        "title": "Webapp connection to app.example.com",
+        "turn": 3
+      },
+      {
+        "address": "t3",
+        "argv": [
+          "/bin/zsh",
+          "-l"
+        ],
+        "cols": 216,
+        "created_ms": 1793398183947,
+        "cwd": "/Users/dev/src/webapp",
+        "die_with_parent": false,
+        "exit_code": null,
+        "finished_ms": null,
+        "foreground": {
+          "argv": [
+            "claude"
+          ],
+          "cwd": "/Users/dev/src/herdr-ui",
+          "name": "2.1.316",
+          "pid": 40970
+        },
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "spc040dfb170567807deb03de4e4f46501",
+          "herdr.tab": "tba632a31b91a901cb9db7a3225dc83a21",
+          "where": "herdr-ui / 1"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 25676,
+        "reason": null,
+        "reported": true,
+        "rm": false,
+        "rows": 46,
+        "screen": "exact",
+        "signal": null,
+        "state": "live",
+        "status": {
+          "app": "claude-code",
+          "msg": "Recording read-only herdr-core fixtures over the socket",
+          "state": "working"
+        },
+        "status_ms": 1793546481535,
+        "template": null,
+        "title": "Herdr iOS agent app",
+        "turn": 2
+      },
+      {
+        "address": "t5",
+        "argv": [
+          "/bin/zsh",
+          "-l"
+        ],
+        "cols": 186,
+        "created_ms": 1793398341009,
+        "cwd": "/Users/dev/src/webapp",
+        "die_with_parent": false,
+        "exit_code": null,
+        "finished_ms": null,
+        "foreground": {
+          "argv": [
+            "/Users/dev/.nvm/versions/node/v24.22.1/lib/node_modules/@openai/codex/node_modules/@openai/codex-darwin-arm64/vendor/aarch64-apple-darwin/bin/codex"
+          ],
+          "cwd": "/Users/dev/src/webapp",
+          "name": "codex",
+          "pid": 30366
+        },
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "spdb3c431bc19042004ffe674965e62320",
+          "herdr.tab": "tb8a57a0f4e30e721c8618ebc73895345e",
+          "where": "webapp / 2"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 29897,
+        "reason": null,
+        "reported": true,
+        "rm": false,
+        "rows": 54,
+        "screen": "exact",
+        "signal": null,
+        "state": "live",
+        "status": {
+          "app": "codex",
+          "state": "idle"
+        },
+        "status_ms": 1793398361029,
+        "template": null,
+        "title": "webapp",
+        "turn": 1
+      },
+      {
+        "address": "t6",
+        "argv": [
+          "hc",
+          "machine",
+          "add",
+          "dev@devbox"
+        ],
+        "cols": 72,
+        "created_ms": 1793470441854,
+        "cwd": "/Users/dev",
+        "die_with_parent": false,
+        "exit_code": 1,
+        "finished_ms": 1793470476875,
+        "identity": "ghostty",
+        "keep": false,
+        "labels": {},
+        "name": "add-dev-devbox",
+        "notify": true,
+        "parent": null,
+        "pid": 88501,
+        "reason": "exited",
+        "reported": false,
+        "rm": false,
+        "rows": 11,
+        "screen": "exact",
+        "signal": null,
+        "state": "finished",
+        "status": null,
+        "status_ms": null,
+        "template": null,
+        "title": "",
+        "turn": 0
+      },
+      {
+        "address": "t7",
+        "argv": [
+          "hc",
+          "machine",
+          "add",
+          "dev@devbox"
+        ],
+        "cols": 72,
+        "created_ms": 1793470483864,
+        "cwd": "/Users/dev",
+        "die_with_parent": false,
+        "exit_code": 1,
+        "finished_ms": 1793470494808,
+        "identity": "ghostty",
+        "keep": false,
+        "labels": {},
+        "name": "add-dev-devbox",
+        "notify": true,
+        "parent": null,
+        "pid": 89171,
+        "reason": "exited",
+        "reported": false,
+        "rm": false,
+        "rows": 11,
+        "screen": "exact",
+        "signal": null,
+        "state": "finished",
+        "status": null,
+        "status_ms": null,
+        "template": null,
+        "title": "",
+        "turn": 0
+      },
+      {
+        "address": "t8",
+        "argv": [
+          "hc",
+          "machine",
+          "add",
+          "dev@devbox"
+        ],
+        "cols": 200,
+        "created_ms": 1793470500167,
+        "cwd": "/Users/dev",
+        "die_with_parent": false,
+        "exit_code": null,
+        "finished_ms": null,
+        "foreground": {
+          "argv": [
+            "hc",
+            "machine",
+            "add",
+            "dev@devbox"
+          ],
+          "cwd": "/Users/dev",
+          "name": "herdr-core",
+          "pid": 89470
+        },
+        "identity": "ghostty",
+        "keep": false,
+        "labels": {},
+        "name": "add-dev-devbox",
+        "notify": true,
+        "parent": null,
+        "pid": 89470,
+        "reason": null,
+        "reported": false,
+        "rm": false,
+        "rows": 120,
+        "screen": "exact",
+        "signal": null,
+        "state": "live",
+        "status": null,
+        "status_ms": null,
+        "template": null,
+        "title": "",
+        "turn": 0
+      },
+      {
+        "address": "t9",
+        "argv": [
+          "/bin/zsh",
+          "-l"
+        ],
+        "cols": 231,
+        "created_ms": 1793544482713,
+        "cwd": "/Users/dev/src/webapp",
+        "die_with_parent": false,
+        "exit_code": null,
+        "finished_ms": null,
+        "foreground": {
+          "argv": [
+            "claude"
+          ],
+          "cwd": "/Users/dev/src",
+          "name": "2.1.316",
+          "pid": 18795
+        },
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "sp53c6b94fc9a97accbbb21326b6bf637e",
+          "herdr.tab": "tba1a50b3016d529e36c006e401153c3fa",
+          "where": "Projects / 1"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 18087,
+        "reason": null,
+        "reported": true,
+        "rm": false,
+        "rows": 54,
+        "screen": "exact",
+        "signal": null,
+        "state": "live",
+        "status": {
+          "app": "claude-code",
+          "state": "done"
+        },
+        "status_ms": 1793545299937,
+        "template": null,
+        "title": "Tailscale SSH from devbox",
+        "turn": 4
+      },
+      {
+        "address": "t10",
+        "argv": [
+          "/bin/zsh",
+          "-l"
+        ],
+        "cols": 216,
+        "created_ms": 1793546417490,
+        "cwd": "/Users/dev/src/herdr-ui",
+        "die_with_parent": false,
+        "exit_code": null,
+        "finished_ms": null,
+        "foreground": {
+          "argv": [
+            "/bin/zsh",
+            "-l"
+          ],
+          "cwd": "/Users/dev/src/herdr-ui",
+          "name": "zsh",
+          "pid": 46596
+        },
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "spdd4893bd58820cae81f278d3baebb471",
+          "herdr.tab": "tb19ffe04c27fdc6c7b8a1f99790095b9d",
+          "where": "herdr-ui / 1"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 46596,
+        "reason": null,
+        "reported": false,
+        "rm": false,
+        "rows": 46,
+        "screen": "exact",
+        "signal": null,
+        "state": "live",
+        "status": null,
+        "status_ms": null,
+        "template": null,
+        "title": "",
+        "turn": 0
+      },
+      {
+        "address": "devbox/t3",
+        "argv": [
+          "powershell.exe",
+          "-NoExit",
+          "-Command",
+          "$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }"
+        ],
+        "cols": 216,
+        "created_ms": 1793399544646,
+        "cwd": "C:\\Users\\dev\\api-server",
+        "die_with_parent": false,
+        "exit_code": null,
+        "finished_ms": null,
+        "foreground": {
+          "argv": [
+            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "-NoExit",
+            "-Command",
+            "$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }"
+          ],
+          "cwd": "C:\\Users\\dev\\api-server",
+          "name": "powershell.exe",
+          "pid": 7516
+        },
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "spbb92375bbd419172420a47ce2330267d",
+          "herdr.tab": "tbedabb39f09a943cd88b406a0ba28b86e",
+          "where": "api-server / 1"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 7516,
+        "reason": null,
+        "reported": true,
+        "rm": false,
+        "rows": 46,
+        "screen": "exact",
+        "signal": null,
+        "state": "live",
+        "status": null,
+        "status_ms": 1793400482625,
+        "template": null,
+        "title": "\u2733 ssh-machine-state-recovery",
+        "turn": 2
+      },
+      {
+        "address": "devbox/t4",
+        "argv": [
+          "hc",
+          "machine",
+          "add",
+          "dev@laptop"
+        ],
+        "cols": 72,
+        "created_ms": 1793544854146,
+        "cwd": "C:\\Users\\dev",
+        "die_with_parent": false,
+        "exit_code": 1,
+        "finished_ms": 1793544854313,
+        "identity": "ghostty",
+        "keep": false,
+        "labels": {},
+        "name": "add-dev-laptop",
+        "notify": true,
+        "parent": null,
+        "pid": 53960,
+        "reason": "exited",
+        "reported": false,
+        "rm": false,
+        "rows": 11,
+        "screen": "exact",
+        "signal": null,
+        "state": "finished",
+        "status": null,
+        "status_ms": null,
+        "template": null,
+        "title": "",
+        "turn": 0
+      },
+      {
+        "address": "devbox/t5",
+        "argv": [
+          "hc",
+          "machine",
+          "add",
+          "dev@laptop"
+        ],
+        "cols": 72,
+        "created_ms": 1793544858924,
+        "cwd": "C:\\Users\\dev",
+        "die_with_parent": false,
+        "exit_code": 1,
+        "finished_ms": 1793544859039,
+        "identity": "ghostty",
+        "keep": false,
+        "labels": {},
+        "name": "add-dev-laptop",
+        "notify": true,
+        "parent": null,
+        "pid": 15060,
+        "reason": "exited",
+        "reported": false,
+        "rm": false,
+        "rows": 11,
+        "screen": "exact",
+        "signal": null,
+        "state": "finished",
+        "status": null,
+        "status_ms": null,
+        "template": null,
+        "title": "",
+        "turn": 0
+      },
+      {
+        "address": "devbox/t6",
+        "argv": [
+          "hc",
+          "machine",
+          "add",
+          "dev@laptop"
+        ],
+        "cols": 72,
+        "created_ms": 1793544875152,
+        "cwd": "C:\\Users\\dev",
+        "die_with_parent": false,
+        "exit_code": 1,
+        "finished_ms": 1793544875335,
+        "identity": "ghostty",
+        "keep": false,
+        "labels": {},
+        "name": "add-dev-laptop",
+        "notify": true,
+        "parent": null,
+        "pid": 28808,
+        "reason": "exited",
+        "reported": false,
+        "rm": false,
+        "rows": 11,
+        "screen": "exact",
+        "signal": null,
+        "state": "finished",
+        "status": null,
+        "status_ms": null,
+        "template": null,
+        "title": "",
+        "turn": 0
+      },
+      {
+        "address": "devbox/t7",
+        "argv": [
+          "powershell.exe",
+          "-NoExit",
+          "-Command",
+          "$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }"
+        ],
+        "cols": 216,
+        "created_ms": 1793545525793,
+        "cwd": "C:\\Users\\dev\\api-server",
+        "die_with_parent": false,
+        "exit_code": 1,
+        "finished_ms": 1793545665983,
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "spdffda958b46f17ba08f1331f8416b9e1",
+          "herdr.tab": "tb4325a98657b17ceef4e31ecccac0533e",
+          "where": "api-server / 1"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 16008,
+        "reason": "killed",
+        "reported": false,
+        "rm": false,
+        "rows": 46,
+        "screen": "exact",
+        "signal": null,
+        "state": "finished",
+        "status": null,
+        "status_ms": null,
+        "template": null,
+        "title": "",
+        "turn": 0
+      },
+      {
+        "address": "devbox/t8",
+        "argv": [
+          "powershell.exe",
+          "-NoExit",
+          "-Command",
+          "$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }"
+        ],
+        "cols": 216,
+        "created_ms": 1793545668397,
+        "cwd": "C:\\Users\\dev",
+        "die_with_parent": false,
+        "exit_code": 1,
+        "finished_ms": 1793545683294,
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "sp17359c5023712f76aea4856ca51f2935",
+          "herdr.tab": "tb68628197785631765b125e8959ea43cb",
+          "where": "dev / 1"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 64808,
+        "reason": "killed",
+        "reported": true,
+        "rm": false,
+        "rows": 46,
+        "screen": "exact",
+        "signal": null,
+        "state": "finished",
+        "status": null,
+        "status_ms": 1793545683294,
+        "template": null,
+        "title": "dev",
+        "turn": 1
+      },
+      {
+        "address": "devbox/t9",
+        "argv": [
+          "powershell.exe",
+          "-NoExit",
+          "-Command",
+          "$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }"
+        ],
+        "cols": 216,
+        "created_ms": 1793545685935,
+        "cwd": "C:\\Users\\dev",
+        "die_with_parent": false,
+        "exit_code": null,
+        "finished_ms": null,
+        "foreground": {
+          "argv": [
+            "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "-NoExit",
+            "-Command",
+            "$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }"
+          ],
+          "cwd": "C:\\Users\\dev\\api-server",
+          "name": "powershell.exe",
+          "pid": 39576
+        },
+        "identity": "ghostty",
+        "keep": true,
+        "labels": {
+          "herdr.space": "spce85eef4050b340e9de5d58e5dde39a1",
+          "herdr.tab": "tb6d97a24c61d1c672af2e94f671b4b3b0",
+          "where": "api-server / 1"
+        },
+        "name": null,
+        "notify": true,
+        "parent": null,
+        "pid": 39576,
+        "reason": null,
+        "reported": true,
+        "rm": false,
+        "rows": 46,
+        "screen": "exact",
+        "signal": null,
+        "state": "live",
+        "status": {
+          "app": "codex",
+          "state": "idle"
+        },
+        "status_ms": 1793546020670,
+        "template": null,
+        "title": "Switch to main and pull | api-server",
+        "turn": 4
+      }
+    ]
+  }
+}

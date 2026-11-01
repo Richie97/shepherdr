@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": -32000,
+    "data": {
+      "hint": "see `hc ls --all`",
+      "kind": "not_found"
+    },
+    "message": "no terminal \"t9999\""
+  },
+  "id": 10,
+  "jsonrpc": "2.0"
+}

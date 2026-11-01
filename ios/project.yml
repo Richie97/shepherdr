@@ -1,0 +1,68 @@
+name: HerdrUI
+options:
+  bundleIdPrefix: dev.richie97
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+packages:
+  SwiftTerm:
+    url: https://github.com/migueldeicaza/SwiftTerm
+    from: 1.99.0
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    DEVELOPMENT_TEAM: L3NS86NMXZ
+    CODE_SIGN_STYLE: Automatic
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  HerdrUI:
+    type: application
+    platform: iOS
+    sources:
+      - HerdrUI
+    dependencies:
+      - package: SwiftTerm
+    info:
+      path: HerdrUI/Info.plist
+      properties:
+        CFBundleDisplayName: Herdr
+        NSCameraUsageDescription: Scan the pairing QR code your hub shows.
+        UILaunchScreen: {}
+        UIBackgroundModes: [remote-notification]
+        CFBundleURLTypes:
+          - CFBundleURLName: dev.richie97.HerdrUI
+            CFBundleURLSchemes: [herdr]
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.richie97.HerdrUI
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_ENTITLEMENTS: HerdrUI/HerdrUI.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+  HerdrUITests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - HerdrUITests
+      - path: ../bridge/testdata
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - target: HerdrUI
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  HerdrUI:
+    build:
+      targets:
+        HerdrUI: all
+        HerdrUITests: [test]
+    test:
+      targets:
+        - HerdrUITests

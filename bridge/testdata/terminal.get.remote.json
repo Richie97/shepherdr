@@ -1,0 +1,56 @@
+{
+  "id": 8,
+  "jsonrpc": "2.0",
+  "result": {
+    "address": "devbox/t9",
+    "argv": [
+      "powershell.exe",
+      "-NoExit",
+      "-Command",
+      "$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }"
+    ],
+    "cols": 216,
+    "created_ms": 1793545685935,
+    "cwd": "C:\\Users\\dev",
+    "die_with_parent": false,
+    "exit_code": null,
+    "finished_ms": null,
+    "foreground": {
+      "argv": [
+        "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "-NoExit",
+        "-Command",
+        "$global:__hc_prompt = $function:prompt; function global:prompt { $p = & $global:__hc_prompt; $l = $ExecutionContext.SessionState.Path.CurrentLocation; if ($l.Provider.Name -eq 'FileSystem') { try { [Environment]::CurrentDirectory = $l.ProviderPath } catch {} }; $p }"
+      ],
+      "cwd": "C:\\Users\\dev\\api-server",
+      "name": "powershell.exe",
+      "pid": 39576
+    },
+    "identity": "ghostty",
+    "keep": true,
+    "labels": {
+      "herdr.space": "spce85eef4050b340e9de5d58e5dde39a1",
+      "herdr.tab": "tb6d97a24c61d1c672af2e94f671b4b3b0",
+      "where": "api-server / 1"
+    },
+    "name": null,
+    "notify": true,
+    "parent": null,
+    "pid": 39576,
+    "reason": null,
+    "reported": true,
+    "rm": false,
+    "rows": 46,
+    "screen": "exact",
+    "signal": null,
+    "state": "live",
+    "status": {
+      "app": "codex",
+      "state": "idle"
+    },
+    "status_ms": 1793546020670,
+    "template": null,
+    "title": "Switch to main and pull | api-server",
+    "turn": 4
+  }
+}

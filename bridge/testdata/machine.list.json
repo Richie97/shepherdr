@@ -1,0 +1,19 @@
+{
+  "id": 4,
+  "jsonrpc": "2.0",
+  "result": {
+    "machines": [
+      {
+        "host": "devbox",
+        "id": "5d1aff386569fd5a96360077df22d2b8",
+        "name": "devbox",
+        "session": null,
+        "state": "connected",
+        "target": "dev@devbox",
+        "temporary": false,
+        "version": "0.1.16",
+        "via": false
+      }
+    ]
+  }
+}

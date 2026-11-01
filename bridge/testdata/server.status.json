@@ -1,0 +1,30 @@
+{
+  "id": 6,
+  "jsonrpc": "2.0",
+  "result": {
+    "core": {
+      "id": "eb4357b3e802b8efb3bcdcc463dfa5f0",
+      "name": "laptop"
+    },
+    "finished": 2,
+    "holder": {
+      "current": true,
+      "instance": "2f9f77e635100eddfdaa8386b4384939",
+      "pid": 14040,
+      "terminals": 6
+    },
+    "holders": [
+      {
+        "current": true,
+        "instance": "2f9f77e635100eddfdaa8386b4384939",
+        "pid": 14040,
+        "terminals": 6
+      }
+    ],
+    "installed_by": null,
+    "live": 6,
+    "pid": 13134,
+    "uptime_ms": 95575100,
+    "version": "0.1.15"
+  }
+}

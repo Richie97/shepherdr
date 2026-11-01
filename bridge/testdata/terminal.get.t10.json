@@ -1,0 +1,49 @@
+{
+  "id": 7,
+  "jsonrpc": "2.0",
+  "result": {
+    "address": "t10",
+    "argv": [
+      "/bin/zsh",
+      "-l"
+    ],
+    "cols": 216,
+    "created_ms": 1793546417490,
+    "cwd": "/Users/dev/src/herdr-ui",
+    "die_with_parent": false,
+    "exit_code": null,
+    "finished_ms": null,
+    "foreground": {
+      "argv": [
+        "/bin/zsh",
+        "-l"
+      ],
+      "cwd": "/Users/dev/src/herdr-ui",
+      "name": "zsh",
+      "pid": 46596
+    },
+    "identity": "ghostty",
+    "keep": true,
+    "labels": {
+      "herdr.space": "spdd4893bd58820cae81f278d3baebb471",
+      "herdr.tab": "tb19ffe04c27fdc6c7b8a1f99790095b9d",
+      "where": "herdr-ui / 1"
+    },
+    "name": null,
+    "notify": true,
+    "parent": null,
+    "pid": 46596,
+    "reason": null,
+    "reported": false,
+    "rm": false,
+    "rows": 46,
+    "screen": "exact",
+    "signal": null,
+    "state": "live",
+    "status": null,
+    "status_ms": null,
+    "template": null,
+    "title": "",
+    "turn": 0
+  }
+}
