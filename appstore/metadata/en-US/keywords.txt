@@ -1,0 +1,1 @@
+terminal,developer,remote,ssh,cli,llm,devops,monitor,approve,notify,shell,automation,programming

@@ -1,7 +1,8 @@
 # App Store assets
 
-- `metadata.md`: every App Store Connect and TestFlight text field, ready to paste, with character counts.
-- `screenshots/`: 6.9" iPhone screenshots (1320×2868) with captions.
+- `metadata/`: the listing text, one file per field. Pushed to App Store Connect automatically when it changes on main.
+- `metadata.md`: which file is which field, plus the parts that stay manual (age rating, privacy answers, review notes).
+- `screenshots/`: 6.9" iPhone screenshots (1320×2868) with captions. Also synced; their order follows the file names.
 - `make-screenshots.swift`: frames raw simulator screenshots into those images.
 - Privacy policy: [`docs/PRIVACY.md`](../docs/PRIVACY.md), linked from the listing.
 
@@ -26,3 +27,14 @@ cd .. && swift appstore/make-screenshots.swift $RAW ios/Shepherdr/Assets.xcasset
 ```
 
 Captions and colors are at the bottom of `make-screenshots.swift`. The demo data is in `ios/Shepherdr/Views/DemoData.swift`.
+
+## Syncing to App Store Connect
+
+`ios/scripts/appstore_sync.py` pushes `metadata/` and `screenshots/` to App Store Connect. It runs in the TestFlight workflow when these change on main, or on a manual run. To run it locally, use the same API key as TestFlight:
+
+```sh
+python3 ios/scripts/appstore_sync.py --check          # offline: lengths, screenshot sizes
+ASC_KEY_PATH=AuthKey.p8 ASC_KEY_ID=... ASC_ISSUER_ID=... python3 ios/scripts/appstore_sync.py
+```
+
+It never submits for review. A version that's in review or live can't be edited, so it's skipped; bump `MARKETING_VERSION` to start the next one.

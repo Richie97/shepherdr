@@ -1,0 +1,1 @@
+First release: agents across all your machines, push notifications with Approve and Deny, a live terminal, starting agents from your phone, and QR pairing.

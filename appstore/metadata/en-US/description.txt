@@ -1,0 +1,40 @@
+Shepherdr keeps an eye on your AI coding agents so you don't have to sit at your desk.
+
+It connects to Herdr, the terminal workspace for coding agents, on all of your machines at once, over your own private Tailscale network. See which agents are working, which are done, and which are waiting on you, then act on it from wherever you are.
+
+NEVER MISS A BLOCKED AGENT
+• Get a notification the moment an agent asks for permission, finishes, or hits an error
+• Approve or deny right from the notification, without opening the app
+• Blocked agents jump to the top, so nothing sits waiting
+
+EVERY AGENT, EVERY MACHINE
+• Agents from your laptop, desktop and servers in one list, grouped by what needs you
+• See each agent's status, workspace and folder at a glance
+• Machines that go offline are flagged, with one tap to reconnect
+
+STEER FROM ANYWHERE
+• Read an agent's screen and send it a prompt
+• Quick keys for answering prompts: Esc, Enter, arrows, 1/2/3, y/n, Ctrl-C
+• Stop an agent that's heading the wrong way
+
+A REAL TERMINAL IN YOUR POCKET
+• Attach to any agent's live terminal, in full color, with a keyboard
+• Works with full-screen agent interfaces
+• Watch-only mode when you just want to look
+
+START AGENTS ON THE GO
+• Pick a machine, a workspace, a folder and an agent, then give it a first task
+• New agents appear in Herdr on your desktop too
+
+PRIVATE BY DESIGN
+• Talks only to a small open-source bridge you run on one of your machines
+• Reached over your Tailscale network; nothing is exposed to the internet
+• No accounts, no analytics, no data collected
+
+REQUIREMENTS
+Shepherdr is a companion app. You'll need:
+• Herdr running on your machines
+• Tailscale on your computers and iPhone
+• herdr-bridge running on one machine (free and open source; setup takes about 15 minutes)
+
+Setup guide: github.com/Richie97/shepherdr

@@ -1,0 +1,1 @@
+Shepherdr is a mobile companion for Herdr: monitor and control AI coding agents on all your machines over Tailscale. Get notified when an agent needs you, approve from the notification, attach to a live terminal, and start new agents from your phone.

@@ -1,8 +1,12 @@
-name: TestFlight
+name: TestFlight and App Store
 
 # One pipeline: CI tests every push; when CI passes on main and the app
 # changed since the last upload, this archives and uploads to TestFlight.
 # Run it from the Actions tab to upload the current main regardless.
+#
+# The same run pushes the App Store listing (appstore/: text, categories,
+# screenshots) to App Store Connect when it changed since the tag
+# `appstore-synced`. Submitting for review stays manual.
 #
 # The last uploaded commit is marked with the tag `testflight-uploaded`, so a
 # merge of several commits (or a change after a failed upload) still ships.
@@ -24,7 +28,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write # to move the testflight-uploaded tag
+  contents: write # to move the testflight-uploaded and appstore-synced tags
 
 jobs:
   gate:
@@ -35,6 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload: ${{ steps.decide.outputs.upload }}
+      store: ${{ steps.decide.outputs.store }}
       sha: ${{ steps.decide.outputs.sha }}
       build: ${{ steps.decide.outputs.build }}
       notes: ${{ steps.decide.outputs.notes }}
@@ -46,6 +51,14 @@ jobs:
       - id: decide
         run: |
           sha=$(git rev-parse HEAD)
+          # App Store listing: appstore/ or the version number changed since the last sync.
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] \
+             || ! git rev-parse -q --verify refs/tags/appstore-synced >/dev/null \
+             || ! git diff --quiet appstore-synced "$sha" -- appstore/ ios/project.yml; then
+            echo "App Store listing: syncing"; echo "store=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "App Store listing unchanged: skipping"; echo "store=false" >> "$GITHUB_OUTPUT"
+          fi
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "build=$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"
           # "What to Test": commit subjects since the last upload (or the last 10).
@@ -145,3 +158,33 @@ jobs:
       - name: Remove API key
         if: always()
         run: rm -rf "$RUNNER_TEMP/asc"
+
+  store:
+    name: Sync App Store listing
+    needs: gate
+    if: needs.gate.outputs.store == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.gate.outputs.sha }}
+      - name: Write API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/asc"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/AuthKey.p8"
+      - name: Push listing text and screenshots
+        env:
+          ASC_KEY_PATH: ${{ runner.temp }}/asc/AuthKey.p8
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: python3 ios/scripts/appstore_sync.py
+      - name: Remove API key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"
+      - name: Mark as synced
+        run: |
+          git tag -f appstore-synced "${{ needs.gate.outputs.sha }}"
+          git push -f origin refs/tags/appstore-synced
