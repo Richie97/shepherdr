@@ -121,6 +121,9 @@ struct AgentDetailView: View {
     }
 
     private func reload() async {
+        #if DEBUG
+        if DemoData.isOn { screen = DemoData.screen(for: address); return }
+        #endif
         guard let c = store.client else { return }
         if let r = try? await c.read(address) { screen = r }
     }

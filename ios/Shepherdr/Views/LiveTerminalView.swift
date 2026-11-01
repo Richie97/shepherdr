@@ -71,6 +71,9 @@ struct LiveTerminalView: View {
     }
 
     private func connect() {
+        #if DEBUG
+        if DemoData.isOn { fontSize = 13; session.showDemo(DemoData.liveANSI); return }
+        #endif
         guard let client = store.client else { return }
         session.connect(client: client, address: address, observe: watchOnly)
     }
@@ -154,6 +157,14 @@ final class LiveTerminalSession: NSObject {
         receiveTask = Task { [weak self] in await self?.receive(ws) }
         if !observe { terminalView.becomeFirstResponder() }
     }
+
+    #if DEBUG
+    func showDemo(_ ansi: String) {
+        terminalView.resetToInitialState()
+        terminalView.feed(text: ansi)
+        state = .live
+    }
+    #endif
 
     func disconnect() {
         receiveTask?.cancel()

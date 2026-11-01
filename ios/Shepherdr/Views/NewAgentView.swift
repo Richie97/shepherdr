@@ -171,7 +171,15 @@ struct NewAgentView: View {
                 tabID = ""
                 if let c = space?.cwd { cwd = c }
             }
-            .onAppear { if cwd.isEmpty { cwd = store.directories(on: machine).first ?? "" } }
+            .onAppear {
+                if cwd.isEmpty { cwd = store.directories(on: machine).first ?? "" }
+                #if DEBUG
+                if DemoData.isOn {
+                    name = "orders-pagination"
+                    task = "Add cursor pagination to GET /v2/orders and update the API docs."
+                }
+                #endif
+            }
         }
     }
 

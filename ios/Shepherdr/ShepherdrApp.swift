@@ -18,18 +18,28 @@ struct ShepherdrApp: App {
         store.connect(to: hub)
     }
 
+    @ViewBuilder private var normalRoot: some View {
+        if let url = URL(string: hubURL), !hubURL.isEmpty {
+            AgentsView()
+                .onAppear { if store.client?.baseURL != url { store.connect(to: url) } }
+        } else {
+            ConnectView { url in
+                hubURL = url.absoluteString
+                store.connect(to: url)
+            }
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {
-                if let url = URL(string: hubURL), !hubURL.isEmpty {
-                    AgentsView()
-                        .onAppear { if store.client?.baseURL != url { store.connect(to: url) } }
-                } else {
-                    ConnectView { url in
-                        hubURL = url.absoluteString
-                        store.connect(to: url)
-                    }
-                }
+                #if DEBUG
+                if DemoData.isOn {
+                    AgentsView().onAppear { store.load(DemoData.terminals, health: DemoData.health) }
+                } else { normalRoot }
+                #else
+                normalRoot
+                #endif
             }
             .environment(store)
             .onOpenURL { AppRouter.shared.open($0) }
