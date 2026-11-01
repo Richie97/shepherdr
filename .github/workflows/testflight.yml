@@ -36,6 +36,8 @@ jobs:
     outputs:
       upload: ${{ steps.decide.outputs.upload }}
       sha: ${{ steps.decide.outputs.sha }}
+      build: ${{ steps.decide.outputs.build }}
+      notes: ${{ steps.decide.outputs.notes }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,6 +47,13 @@ jobs:
         run: |
           sha=$(git rev-parse HEAD)
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "build=$(date -u +%Y%m%d%H%M)" >> "$GITHUB_OUTPUT"
+          # "What to Test": commit subjects since the last upload (or the last 10).
+          range=$(git rev-parse -q --verify refs/tags/testflight-uploaded >/dev/null && echo "testflight-uploaded..$sha" || echo "-10 $sha")
+          { echo "notes<<NOTES_EOF"
+            echo "Changes in this build:"
+            git log --no-merges --format='• %s' $range -- | head -30
+            echo "NOTES_EOF"; } >> "$GITHUB_OUTPUT"
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "Manual run: uploading $sha"; echo "upload=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
@@ -86,6 +95,7 @@ jobs:
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          BUILD_NUMBER: ${{ needs.gate.outputs.build }}
         run: ios/scripts/testflight.sh
       - name: Remove API key
         if: always()
@@ -100,3 +110,33 @@ jobs:
           name: testflight-logs
           path: ios/build/testflight/*.log
           if-no-files-found: ignore
+
+  distribute:
+    name: Add to Internal group
+    needs: [gate, upload]
+    runs-on: ubuntu-latest # waiting on Apple's processing is cheaper here than on macOS
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.gate.outputs.sha }}
+      - name: Write API key and notes
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          NOTES: ${{ needs.gate.outputs.notes }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/asc"
+          printf '%s\n' "$ASC_KEY_P8" > "$RUNNER_TEMP/asc/AuthKey.p8"
+          printf '%s\n' "$NOTES" > "$RUNNER_TEMP/notes.txt"
+          cat "$RUNNER_TEMP/notes.txt"
+      - name: Wait for processing, set notes, add to group
+        env:
+          ASC_KEY_PATH: ${{ runner.temp }}/asc/AuthKey.p8
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          python3 ios/scripts/testflight_distribute.py --build "${{ needs.gate.outputs.build }}" \
+            --group Internal --notes-file "$RUNNER_TEMP/notes.txt"
+      - name: Remove API key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/asc"

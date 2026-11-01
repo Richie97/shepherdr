@@ -16,7 +16,8 @@ cd "$(dirname "$0")/.."
 upload=1
 [[ "${1:-}" == "--no-upload" ]] && upload=0
 
-build=$(date -u +%Y%m%d%H%M)
+# CI passes BUILD_NUMBER so later steps know which build to look for.
+build=${BUILD_NUMBER:-$(date -u +%Y%m%d%H%M)}
 out=build/testflight
 rm -rf "$out"
 mkdir -p "$out"
