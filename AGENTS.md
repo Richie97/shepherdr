@@ -56,6 +56,7 @@ The core on this Mac runs the user's real agents.
 - iPhone Duo (foldable, iOS 27.1+): the outer screen is 466×678 pt (compact) and the inner one 669×951 pt. `AgentsView` switches on `horizontalSizeClass`: a stack when compact, a list + detail `NavigationSplitView` when regular. Both share one `selected` agent, so folding keeps it open.
   - This Mac has no Simulator.app, so the Duo can't be unfolded here. Its outer screen is `simctl io <duo> screenshot --display=1`.
   - Test the regular-width layout with `-demo YES -landscape YES` on an iPhone 17 Pro Max.
+  - Keep the agent list's `List(selection:)` bound to `selected` in both layouts. A constant binding makes taps on `NavigationLink(value:)` do nothing on phones. `ShepherdrUITests` taps through the demo agents to catch this.
 - TestFlight: `ios/scripts/testflight.sh` (`--no-upload` only archives). It signs and exports the `.ipa` locally, then uploads it with `testflight_distribute.py --upload` through the App Store Connect **Build Uploads API**. xcodebuild's own upload rejects team API keys ("Cannot verify client's JWT headers", CDWebService 3004) even when the key works for the API and for signing. It uses a UTC timestamp build number; bump `MARKETING_VERSION` in project.yml for a new version. Uploading needs an Xcode account or `ASC_KEY_PATH`/`ASC_KEY_ID`/`ASC_ISSUER_ID`.
 - CI (`.github/workflows`):
   - `ci.yml`: bridge and iOS tests on pull requests and on pushes to main. This is the only place tests run.

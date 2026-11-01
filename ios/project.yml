@@ -62,12 +62,25 @@ targets:
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
+  ShepherdrUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - ShepherdrUITests
+    dependencies:
+      - target: Shepherdr
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Shepherdr
 schemes:
   Shepherdr:
     build:
       targets:
         Shepherdr: all
         ShepherdrTests: [test]
+        ShepherdrUITests: [test]
     test:
       targets:
         - ShepherdrTests
+        - ShepherdrUITests

@@ -82,7 +82,11 @@ struct AgentsView: View {
     }
 
     private var agentList: some View {
-        List(selection: isSplit ? $selected : .constant(nil)) {
+        // Always bound to `selected`: a List with a selection binding routes
+        // NavigationLink taps into it instead of pushing, so a constant one
+        // makes rows dead. The stack's path follows `selected`, so this
+        // pushes on phones and fills the detail column when split.
+        List(selection: $selected) {
             ConnectionBanner()
             ForEach(store.unavailableMachines) { m in MachineDownRow(machine: m) }
             ForEach(AgentState.allCases, id: \.self) { state in
