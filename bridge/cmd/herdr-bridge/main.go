@@ -1,4 +1,4 @@
-// Command herdr-bridge exposes a local herdr-core to the Herdr UI iOS app
+// Command herdr-bridge exposes a local herdr-core to the Shepherdr iOS app
 // over Tailscale. See docs/PLAN.md.
 package main
 

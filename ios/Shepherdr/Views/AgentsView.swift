@@ -77,7 +77,7 @@ struct AgentsView: View {
             }
         }
         .onChange(of: AppRouter.shared.pendingAddress) { _, address in
-            // A tapped notification or herdr://terminal link.
+            // A tapped notification or shepherdr://terminal link.
             guard let address else { return }
             path = [address]
             AppRouter.shared.pendingAddress = nil
@@ -85,7 +85,7 @@ struct AgentsView: View {
     }
 
     static func address(from url: URL) -> String? {
-        guard url.scheme == "herdr", url.host() == "terminal" else { return nil }
+        guard url.scheme == "shepherdr", url.host() == "terminal" else { return nil }
         let address = url.path().trimmingCharacters(in: CharacterSet(charactersIn: "/"))
         return address.isEmpty ? nil : address
     }

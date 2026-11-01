@@ -1,5 +1,5 @@
 // Draws the app icon (a sheep with a terminal-prompt face).
-// Usage: swift ios/scripts/make-icon.swift ios/HerdrUI/Assets.xcassets/AppIcon.appiconset/AppIcon.png
+// Usage: swift ios/scripts/make-icon.swift ios/Shepherdr/Assets.xcassets/AppIcon.appiconset/AppIcon.png
 import AppKit
 import CoreGraphics
 

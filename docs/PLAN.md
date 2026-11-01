@@ -1,4 +1,4 @@
-# Herdr UI: iOS remote for Herdr agents
+# Shepherdr: iOS remote for Herdr agents
 
 An iOS app that lets you see and control the coding agents running in Herdr on each of your machines. All traffic goes over Tailscale.
 
@@ -87,7 +87,7 @@ tailscale serve --https=8443  ─►  herdr-bridge (127.0.0.1:7777)  ─►  hc 
 
 ```
 bridge/   Go module (cmd/herdr-bridge, internal/{core,server,push,tailnet})
-ios/      XcodeGen project.yml + HerdrUI app
+ios/      XcodeGen project.yml + Shepherdr app
 docs/     PLAN.md, protocol.md
 ```
 

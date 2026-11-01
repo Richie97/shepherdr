@@ -1,6 +1,6 @@
-name: HerdrUI
+name: Shepherdr
 options:
-  bundleIdPrefix: dev.richie97
+  bundleIdPrefix: app.shepherdr
   deploymentTarget:
     iOS: "18.0"
   createIntermediateGroups: true
@@ -17,52 +17,52 @@ settings:
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
 targets:
-  HerdrUI:
+  Shepherdr:
     type: application
     platform: iOS
     sources:
-      - HerdrUI
+      - Shepherdr
     dependencies:
       - package: SwiftTerm
     info:
-      path: HerdrUI/Info.plist
+      path: Shepherdr/Info.plist
       properties:
-        CFBundleDisplayName: Herdr
+        CFBundleDisplayName: Shepherdr
         NSCameraUsageDescription: Scan the pairing QR code your hub shows.
         UILaunchScreen: {}
         UIBackgroundModes: [remote-notification]
         CFBundleURLTypes:
-          - CFBundleURLName: dev.richie97.HerdrUI
-            CFBundleURLSchemes: [herdr]
+          - CFBundleURLName: app.shepherdr
+            CFBundleURLSchemes: [shepherdr]
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: dev.richie97.HerdrUI
+        PRODUCT_BUNDLE_IDENTIFIER: app.shepherdr
         TARGETED_DEVICE_FAMILY: "1"
-        CODE_SIGN_ENTITLEMENTS: HerdrUI/HerdrUI.entitlements
+        CODE_SIGN_ENTITLEMENTS: Shepherdr/Shepherdr.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-  HerdrUITests:
+  ShepherdrTests:
     type: bundle.unit-test
     platform: iOS
     sources:
-      - HerdrUITests
+      - ShepherdrTests
       - path: ../bridge/testdata
         type: folder
         buildPhase: resources
     dependencies:
-      - target: HerdrUI
+      - target: Shepherdr
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
 schemes:
-  HerdrUI:
+  Shepherdr:
     build:
       targets:
-        HerdrUI: all
-        HerdrUITests: [test]
+        Shepherdr: all
+        ShepherdrTests: [test]
     test:
       targets:
-        - HerdrUITests
+        - ShepherdrTests

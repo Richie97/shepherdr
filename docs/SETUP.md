@@ -1,6 +1,6 @@
-# Setting up Herdr UI
+# Setting up Shepherdr
 
-Herdr UI is an iPhone app for watching and steering the coding agents you run in [Herdr](https://herdr.dev), on all your machines. It talks to a small bridge that runs on one machine, over your Tailscale network. Nothing is exposed to the internet.
+Shepherdr is an iPhone app for watching and steering the coding agents you run in [Herdr](https://herdr.dev), on all your machines. It talks to a small bridge that runs on one machine, over your Tailscale network. Nothing is exposed to the internet.
 
 ```
 iPhone ──Tailscale (HTTPS)──► herdr-bridge on your "hub" ──► Herdr core on the hub ──► your other machines
@@ -112,12 +112,12 @@ The project is generated from `ios/project.yml`. Point it at your own Apple acco
 
 1. In `ios/project.yml`, set:
    - `DEVELOPMENT_TEAM` to your Team ID (developer.apple.com → Membership)
-   - `bundleIdPrefix` and `PRODUCT_BUNDLE_IDENTIFIER` to something you own, e.g. `com.yourname.HerdrUI`
+   - `bundleIdPrefix` and `PRODUCT_BUNDLE_IDENTIFIER` to something you own, e.g. `com.yourname.Shepherdr`
 2. Generate and open the project:
    ```sh
    cd ios
    xcodegen generate
-   open HerdrUI.xcodeproj
+   open Shepherdr.xcodeproj
    ```
 3. Choose your iPhone as the run destination and press **Run**.
    - When Xcode asks about the SwiftTerm package plugin, choose **Trust & Enable**.
@@ -126,14 +126,14 @@ The project is generated from `ios/project.yml`. Point it at your own Apple acco
 Command-line build, if you prefer:
 
 ```sh
-xcodebuild -scheme HerdrUI -destination 'id=<device-udid>' -allowProvisioningUpdates -skipPackagePluginValidation build
+xcodebuild -scheme Shepherdr -destination 'id=<device-udid>' -allowProvisioningUpdates -skipPackagePluginValidation build
 ```
 
 ## 5. Pair the phone
 
 With Tailscale on, on the phone:
 
-- **Easiest:** open `https://<hub>…:8443/pair` in a desktop browser, or run `herdr-bridge pair` on the hub. Point the iPhone **Camera** at the QR code and tap the Herdr banner. Confirm **Connect**.
+- **Easiest:** open `https://<hub>…:8443/pair` in a desktop browser, or run `herdr-bridge pair` on the hub. Point the iPhone **Camera** at the QR code and tap the Shepherdr banner. Confirm **Connect**.
 - Or, in the app, tap **Scan QR code**, or type the hub's address (`hub.your-tailnet.ts.net`).
 
 You should see your agents grouped as **Needs you / Error / Done / Working / Idle**.
@@ -153,7 +153,7 @@ You should see your agents grouped as **Needs you / Error / Done / Working / Idl
    - `apns.p8`: the key you downloaded, renamed.
    - `apns.json`:
      ```json
-     { "key_id": "ABC123DEFG", "team_id": "YOURTEAMID", "topic": "com.yourname.HerdrUI" }
+     { "key_id": "ABC123DEFG", "team_id": "YOURTEAMID", "topic": "com.yourname.Shepherdr" }
      ```
      `topic` must be exactly your app's bundle ID.
 3. **Restart the bridge:** run `install` again, or restart the service. `/v1/health` should now say `"push_enabled": true`.

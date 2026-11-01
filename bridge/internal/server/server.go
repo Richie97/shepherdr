@@ -368,7 +368,7 @@ func (s *server) pushTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sent, errs := s.cfg.Push.SendAll(r.Context(), push.Notification{
-		Title: "Herdr", Subtitle: "Test", Body: "Push notifications are working.",
+		Title: "Shepherdr", Subtitle: "Test", Body: "Push notifications are working.",
 		Category: "TEST", ThreadID: "test",
 	})
 	msgs := make([]string, len(errs))

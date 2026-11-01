@@ -10,7 +10,7 @@ func TestLinkRoundTrips(t *testing.T) {
 	hub := "https://hub.example.ts.net:8443"
 	l := Link(hub)
 	u, err := url.Parse(l)
-	if err != nil || u.Scheme != "herdr" || u.Host != "pair" || u.Query().Get("hub") != hub {
+	if err != nil || u.Scheme != "shepherdr" || u.Host != "pair" || u.Query().Get("hub") != hub {
 		t.Fatalf("Link = %q (%v)", l, err)
 	}
 }
@@ -36,7 +36,7 @@ func TestPageHasQRAndHub(t *testing.T) {
 		t.Fatal(err)
 	}
 	h := b.String()
-	for _, want := range []string{"<svg", "hub.example.ts.net:8443", "<title>Pair Herdr</title>"} {
+	for _, want := range []string{"<svg", "hub.example.ts.net:8443", "<title>Pair Shepherdr</title>"} {
 		if !strings.Contains(h, want) {
 			t.Errorf("page missing %q", want)
 		}

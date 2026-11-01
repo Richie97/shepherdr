@@ -43,7 +43,7 @@ struct ConnectView: View {
                     .disabled(address.isEmpty || checking)
                 }
             }
-            .navigationTitle("Herdr")
+            .navigationTitle("Shepherdr")
             .sheet(isPresented: $scanning) {
                 PairScanner { hub in
                     address = hub.host().map { h in hub.port.map { "\(h):\($0)" } ?? h } ?? hub.absoluteString

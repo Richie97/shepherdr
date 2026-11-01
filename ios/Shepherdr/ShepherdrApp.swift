@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct HerdrUIApp: App {
+struct ShepherdrApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var store = HerdrStore()
     @AppStorage("hubURL") private var hubURL = ""

@@ -1,4 +1,4 @@
-# Herdr UI
+# Shepherdr
 
 An iPhone app for the coding agents you run in [Herdr](https://herdr.dev): see every agent on every machine, read and drive them, start new ones, and get a push notification (with **Approve** / **Deny**) when one needs you. Everything travels over your own Tailscale network.
 

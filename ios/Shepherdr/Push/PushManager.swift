@@ -13,9 +13,9 @@ final class AppRouter {
     /// A hub from a pairing link, waiting for the user to confirm.
     var pendingHub: URL?
 
-    /// Routes herdr:// links: pair?hub=… and terminal/<address>.
+    /// Routes shepherdr:// links: pair?hub=… and terminal/<address>.
     func open(_ url: URL) {
-        guard url.scheme == "herdr" else { return }
+        guard url.scheme == "shepherdr" else { return }
         switch url.host() {
         case "pair":
             pendingHub = PairLink.hub(from: url.absoluteString)

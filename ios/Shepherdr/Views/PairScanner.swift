@@ -1,12 +1,12 @@
 import SwiftUI
 import VisionKit
 
-/// Pairing links: `herdr://pair?hub=<url>` (from `herdr-bridge pair` or the
+/// Pairing links: `shepherdr://pair?hub=<url>` (from `herdr-bridge pair` or the
 /// hub's /pair page). A bare hub URL or host also works.
 enum PairLink {
     static func hub(from string: String) -> URL? {
         let s = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let u = URL(string: s), u.scheme == "herdr" {
+        if let u = URL(string: s), u.scheme == "shepherdr" {
             guard u.host() == "pair",
                   let hub = URLComponents(url: u, resolvingAgainstBaseURL: false)?
                       .queryItems?.first(where: { $0.name == "hub" })?.value

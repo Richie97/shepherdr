@@ -11,10 +11,10 @@ import (
 )
 
 // Link is the app's pairing URL for a hub, e.g.
-// herdr://pair?hub=https%3A%2F%2Fhub.tailnet.ts.net%3A8443. Scanning it with
+// shepherdr://pair?hub=https%3A%2F%2Fhub.tailnet.ts.net%3A8443. Scanning it with
 // the iPhone Camera opens the app.
 func Link(hub string) string {
-	return "herdr://pair?hub=" + url.QueryEscape(hub)
+	return "shepherdr://pair?hub=" + url.QueryEscape(hub)
 }
 
 // Terminal renders text as a QR code for a terminal, two modules per
@@ -75,7 +75,7 @@ func SVG(text string) (template.HTML, error) {
 
 var page = template.Must(template.New("pair").Parse(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pair Herdr</title>
+<title>Pair Shepherdr</title>
 <style>
 :root { color-scheme: light dark; --bg: #f6f6f4; --fg: #1d1d1b; --muted: #6b6b66; --card: #fff; }
 @media (prefers-color-scheme: dark) { :root { --bg: #161615; --fg: #ecece8; --muted: #9a9a94; --card: #222220; } }
@@ -88,7 +88,7 @@ code { background: var(--card); padding: .15rem .4rem; border-radius: 6px; word-
 p { color: var(--muted); }
 </style></head>
 <body><main>
-<h1>Pair Herdr</h1>
+<h1>Pair Shepherdr</h1>
 <p>Point your iPhone camera at the code, or use <b>Scan QR code</b> in the app.</p>
 <div class="qr">{{.SVG}}</div>
 <p>Hub: <code>{{.Hub}}</code></p>

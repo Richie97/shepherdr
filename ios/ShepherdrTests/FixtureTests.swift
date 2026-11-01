@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import HerdrUI
+@testable import Shepherdr
 
 /// Decoding and event handling against payloads recorded from a live core
 /// (bridge/testdata, bundled as the "testdata" folder).
@@ -109,9 +109,9 @@ struct TerminalHelperTests {
     }
 
     @Test @MainActor func parsesTerminalLinks() {
-        #expect(AgentsView.address(from: URL(string: "herdr://terminal/simrig/t9")!) == "simrig/t9")
-        #expect(AgentsView.address(from: URL(string: "herdr://terminal/t1")!) == "t1")
-        #expect(AgentsView.address(from: URL(string: "herdr://terminal/")!) == nil)
+        #expect(AgentsView.address(from: URL(string: "shepherdr://terminal/simrig/t9")!) == "simrig/t9")
+        #expect(AgentsView.address(from: URL(string: "shepherdr://terminal/t1")!) == "t1")
+        #expect(AgentsView.address(from: URL(string: "shepherdr://terminal/")!) == nil)
         #expect(AgentsView.address(from: URL(string: "https://terminal/t1")!) == nil)
         #expect(Terminal(address: "simrig/t9").localAddress == "t9")
     }
@@ -124,10 +124,10 @@ struct TerminalHelperTests {
     }
 
     @Test func parsesPairLinks() {
-        #expect(PairLink.hub(from: "herdr://pair?hub=https%3A%2F%2Fhub.x.ts.net%3A8443")?.absoluteString == "https://hub.x.ts.net:8443")
+        #expect(PairLink.hub(from: "shepherdr://pair?hub=https%3A%2F%2Fhub.x.ts.net%3A8443")?.absoluteString == "https://hub.x.ts.net:8443")
         #expect(PairLink.hub(from: "hub.x.ts.net")?.absoluteString == "https://hub.x.ts.net:8443")
-        #expect(PairLink.hub(from: "herdr://terminal/t1") == nil)
-        #expect(PairLink.hub(from: "herdr://pair") == nil)
+        #expect(PairLink.hub(from: "shepherdr://terminal/t1") == nil)
+        #expect(PairLink.hub(from: "shepherdr://pair") == nil)
     }
 
     @Test func normalizesHubAddress() {
