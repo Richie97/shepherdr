@@ -47,18 +47,23 @@ run "$out/archive.log" archive -scheme Shepherdr -configuration Release \
   -derivedDataPath build -allowProvisioningUpdates -skipPackagePluginValidation \
   CURRENT_PROJECT_VERSION="$build" ${auth[@]+"${auth[@]}"}
 
-opts=ExportOptions.plist
-if [[ $upload == 0 ]]; then
-  opts="$out/ExportOptions-local.plist"
-  sed 's#<string>upload</string>#<string>export</string>#' ExportOptions.plist > "$opts"
-fi
-echo "exporting$([[ $upload == 1 ]] && echo ' and uploading')..."
+# Sign for App Store distribution and export the .ipa locally. Uploading is a
+# separate step: xcodebuild's own upload rejects team API keys (CDWebService
+# 3004 "Cannot verify client's JWT headers"), the Build Uploads API doesn't.
+opts="$out/ExportOptions-local.plist"
+sed 's#<string>upload</string>#<string>export</string>#' ExportOptions.plist > "$opts"
+echo "signing and exporting..."
 run "$out/export.log" -exportArchive -archivePath "$out/Shepherdr.xcarchive" -exportOptionsPlist "$opts" \
   -exportPath "$out/export" -allowProvisioningUpdates ${auth[@]+"${auth[@]}"}
-
+ipa=$(ls "$out"/export/*.ipa)
 version=$(/usr/libexec/PlistBuddy -c 'Print :ApplicationProperties:CFBundleShortVersionString' "$out/Shepherdr.xcarchive/Info.plist")
-if [[ $upload == 1 ]]; then
+
+if [[ $upload == 0 ]]; then
+  echo "Exported Shepherdr $version ($build): ios/$ipa"
+elif [[ -n "${ASC_KEY_PATH:-}" ]]; then
+  python3 scripts/testflight_distribute.py --upload "$ipa" --version "$version" --build "$build"
   echo "Uploaded Shepherdr $version ($build). It appears in TestFlight after Apple finishes processing (usually 5-15 min)."
 else
-  echo "Exported Shepherdr $version ($build) to ios/$out/export"
+  echo "Exported ios/$ipa. Upload it with Transporter, or set ASC_KEY_PATH/ASC_KEY_ID/ASC_ISSUER_ID." >&2
+  exit 1
 fi

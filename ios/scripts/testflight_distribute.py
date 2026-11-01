@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
-"""After an upload: wait for App Store Connect to process the build, add it to a
-TestFlight group, and set its "What to Test" notes.
+"""Talk to App Store Connect for TestFlight:
+
+  --check          verify the API key can see the app (preflight)
+  --upload IPA     upload a signed .ipa through the Build Uploads API
+  --build N        wait for build N to process, set What to Test, add it to a group
+
+xcodebuild's own upload (-exportArchive with destination=upload) rejects
+team API keys with "Cannot verify client's JWT headers" (CDWebService 3004)
+even when the key works everywhere else, so CI exports the .ipa locally and
+uploads it here instead.
 
 Standard library only; the API token is signed with the `openssl` CLI.
 
@@ -13,6 +21,7 @@ every build, so adding is skipped for it; notes are still set.
 """
 import argparse
 import base64
+import hashlib
 import json
 import os
 import subprocess
@@ -66,6 +75,7 @@ class ASC:
         self._tok, self._at = None, 0
 
     def call(self, method, path, body=None, ok_codes=(200, 201, 204)):
+        """JSON request to the App Store Connect API."""
         if time.time() - self._at > 600:
             self._tok, self._at = token(*self.key), time.time()
         req = urllib.request.Request(API + path, method=method,
@@ -82,6 +92,66 @@ class ASC:
             raise SystemExit(f"App Store Connect {method} {path}: HTTP {e.code}\n{detail}")
 
 
+def put_part(op: dict, data: bytes):
+    """Send one byte range to the URL App Store Connect handed out (no API auth)."""
+    headers = {h["name"]: h["value"] for h in op.get("requestHeaders") or []}
+    req = urllib.request.Request(op["url"], data=data, method=op.get("method", "PUT"), headers=headers)
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=300) as r:
+                r.read()
+                return
+        except (urllib.error.URLError, TimeoutError) as e:
+            if attempt == 3:
+                raise SystemExit(f"upload of part {op.get('partNumber')} failed: {e}")
+            time.sleep(2 ** attempt)
+
+
+def upload_ipa(asc, app_id: str, ipa: str, version: str, build: str, timeout: int):
+    size = os.path.getsize(ipa)
+    md5 = hashlib.md5()
+    with open(ipa, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            md5.update(chunk)
+
+    up = asc.call("POST", "/v1/buildUploads", {"data": {
+        "type": "buildUploads",
+        "attributes": {"cfBundleShortVersionString": version, "cfBundleVersion": build, "platform": "IOS"},
+        "relationships": {"app": {"data": {"type": "apps", "id": app_id}}}}})["data"]
+    print(f"build upload {up['id']} created for {version} ({build})", flush=True)
+
+    file = asc.call("POST", "/v1/buildUploadFiles", {"data": {
+        "type": "buildUploadFiles",
+        "attributes": {"assetType": "ASSET", "fileName": os.path.basename(ipa), "fileSize": size, "uti": "com.apple.ipa"},
+        "relationships": {"buildUpload": {"data": {"type": "buildUploads", "id": up["id"]}}}}})["data"]
+    ops = file["attributes"].get("uploadOperations") or []
+    print(f"uploading {size / 1e6:.1f} MB in {len(ops)} part(s)", flush=True)
+    with open(ipa, "rb") as f:
+        for op in sorted(ops, key=lambda o: o.get("offset", 0)):
+            f.seek(op.get("offset", 0))
+            put_part(op, f.read(op.get("length", size)))
+
+    asc.call("PATCH", f"/v1/buildUploadFiles/{file['id']}", {"data": {
+        "type": "buildUploadFiles", "id": file["id"],
+        "attributes": {"uploaded": True, "sourceFileChecksums": {"file": {"algorithm": "MD5", "hash": md5.hexdigest()}}}}})
+    print("upload committed; waiting for App Store Connect to accept it", flush=True)
+
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        st = asc.call("GET", f"/v1/buildUploads/{up['id']}")["data"]["attributes"].get("state") or {}
+        state = st.get("state")
+        for kind in ("errors", "warnings"):
+            for d in st.get(kind) or []:
+                print(f"  {kind[:-1]}: {d.get('code')}: {d.get('description')}", flush=True)
+        print(f"upload state: {state}", flush=True)
+        if state == "COMPLETE":
+            return
+        if state == "FAILED":
+            raise SystemExit("App Store Connect rejected the upload (see errors above)")
+        time.sleep(20)
+    raise SystemExit(f"upload not accepted within {timeout}s")
+
+
 def q(params: dict) -> str:
     return "?" + urllib.parse.urlencode(params)
 
@@ -89,6 +159,8 @@ def q(params: dict) -> str:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--build", help="CFBundleVersion of the uploaded build")
+    ap.add_argument("--upload", metavar="IPA", help="upload this signed .ipa (needs --version and --build)")
+    ap.add_argument("--version", help="CFBundleShortVersionString, for --upload")
     ap.add_argument("--check", action="store_true",
                     help="only verify the API key can see the app (preflight before archiving)")
     ap.add_argument("--bundle-id", default="app.shepherdr")
@@ -109,6 +181,11 @@ def main():
         return
     if not a.build:
         ap.error("--build is required")
+    if a.upload:
+        if not a.version:
+            ap.error("--upload needs --version")
+        upload_ipa(asc, app_id, a.upload, a.version, a.build, a.timeout)
+        return
 
     # The build shows up a few minutes after upload, then processes.
     deadline = time.time() + a.timeout
