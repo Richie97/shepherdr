@@ -20,8 +20,8 @@ struct AgentDetailView: View {
         VStack(spacing: 0) {
             if let t = terminal { StatusHeader(terminal: t) }
             output
+            controls
         }
-        .safeAreaInset(edge: .bottom) { controls }
         .navigationTitle(terminal?.displayName ?? address)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -104,13 +104,16 @@ struct AgentDetailView: View {
                     Image(systemName: busy ? "ellipsis.circle.fill" : "arrow.up.circle.fill")
                         .font(.system(size: 32))
                 }
-                .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || busy || terminal?.isLive == false)
-                .accessibilityLabel("Send")
+                .disabled(busy || terminal?.isLive == false)
+                .accessibilityLabel(draftText.isEmpty ? "Accept suggestion" : "Send")
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(.bar)
+        // Past the home indicator and the trailing edge only: on all edges, the
+        // bar would spread sideways under the sidebar and span the whole
+        // unfolded screen. The leading edge borders the sidebar.
+        .background(.bar, ignoresSafeAreaEdges: [.bottom, .trailing])
     }
 
     // MARK: Actions
@@ -128,17 +131,33 @@ struct AgentDetailView: View {
         if let r = try? await c.read(address) { screen = r }
     }
 
+    private var draftText: String { draft.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+    /// Sends the draft, or accepts the agent's suggestion if the draft is empty.
     private func send(force: Bool) {
-        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !text.isEmpty else { return }
+        let text = draftText
         if terminal?.agentState == .blocked, !force {
             confirmForce = true
+            return
+        }
+        if text.isEmpty {
+            run("Accepted suggestion") { try await acceptSuggestion() }
             return
         }
         run("Sent") {
             _ = try await client().send(address, text: text, force: force)
             draft = ""
         }
+    }
+
+    /// Tab fills in the suggestion and Enter submits it. Sent one at a time with
+    /// a pause: in one call they can arrive 1 ms apart, before the agent's UI has
+    /// applied the Tab.
+    private func acceptSuggestion() async throws {
+        let c = try client()
+        _ = try await c.keys(address, ["tab"])
+        try await Task.sleep(for: .milliseconds(300))
+        _ = try await c.keys(address, ["enter"])
     }
 
     private func interrupt() async throws {

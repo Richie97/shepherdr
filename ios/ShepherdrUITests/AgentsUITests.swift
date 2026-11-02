@@ -1,6 +1,8 @@
 import XCTest
 
-/// Taps through the demo agents (no hub needed).
+/// Taps through the demo agents (no hub needed). Works in both layouts: a
+/// pushed stack on compact phones, list + detail side by side on wide ones
+/// (unfolded Duo, landscape Pro Max, iPad).
 final class AgentsUITests: XCTestCase {
     override func setUp() { continueAfterFailure = false }
 
@@ -14,15 +16,18 @@ final class AgentsUITests: XCTestCase {
         XCTAssertTrue(row.waitForExistence(timeout: 10))
         row.tap()
 
-        // Pushed: there's a back button to the list.
-        let back = app.navigationBars.buttons["Agents"]
-        XCTAssertTrue(back.waitForExistence(timeout: 5), "agent detail didn't open")
+        // The detail's composer is named after the agent (t2 is codex).
+        XCTAssertTrue(app.textFields["Message codex"].waitForExistence(timeout: 5), "agent detail didn't open")
 
-        // Back, then a different agent.
-        back.tap()
+        // Compact: go back to the list. Regular: the list is still on screen.
+        // iOS 26 labels the back button with the list's title; iOS 27 drops
+        // the label and keeps only the identifier.
+        let back = [app.buttons["BackButton"], app.navigationBars.buttons["Agents"]].first { $0.exists }
+        back?.tap()
+
         let other = app.staticTexts["Fix flaky retry test"]
-        XCTAssertTrue(other.waitForExistence(timeout: 5))
+        XCTAssertTrue(other.waitForExistence(timeout: 5), "agent list isn't showing")
         other.tap()
-        XCTAssertTrue(back.waitForExistence(timeout: 5), "second agent didn't open")
+        XCTAssertTrue(app.textFields["Message claude-code"].waitForExistence(timeout: 5), "second agent didn't open")
     }
 }
