@@ -110,9 +110,10 @@ struct AgentDetailView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        // Only past the home indicator: on all edges, the bar would spread
-        // sideways under the sidebar and span the whole unfolded screen.
-        .background(.bar, ignoresSafeAreaEdges: .bottom)
+        // Past the home indicator and the trailing edge only: on all edges, the
+        // bar would spread sideways under the sidebar and span the whole
+        // unfolded screen. The leading edge borders the sidebar.
+        .background(.bar, ignoresSafeAreaEdges: [.bottom, .trailing])
     }
 
     // MARK: Actions
