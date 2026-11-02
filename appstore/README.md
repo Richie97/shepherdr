@@ -4,7 +4,7 @@
 - `metadata.md`: which file is which field, plus the parts that stay manual (age rating, privacy answers, review notes).
 - `screenshots/`: 6.9" iPhone screenshots (1320×2868) with captions. Also synced; their order follows the file names.
 - `make-screenshots.swift`: frames raw simulator screenshots into those images.
-- Privacy policy: [`docs/PRIVACY.md`](../docs/PRIVACY.md), linked from the listing.
+- Privacy policy: the listing links to https://speedshift.io/privacy (the Shepherdr section of the Speedshift policy). [`docs/PRIVACY.md`](../docs/PRIVACY.md) is the same text; keep both in sync.
 
 ## Regenerating the screenshots
 
