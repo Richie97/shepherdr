@@ -49,6 +49,17 @@ The app collects no data. Push tokens are sent only to the user's own hub. The c
 ```
 - **Attachment:** a 30–60 s screen recording of the app connected to your hub, showing the agents list, a notification with Approve, the live terminal and New agent. Reviewers can't reach your tailnet, so without the recording an App Store submission is likely to be rejected under 2.1 (App Completeness).
 
+## Header and Search Results (iOS 27)
+
+On the version's page: **Product Page Information → Header and Search Results**, upload:
+
+| Placement | File | Spec |
+|---|---|---|
+| Product page header | `creative/header.png` | 3840×1646 (21:9), one image for every language |
+| Search results | `creative/search.png` | 3840×2560 (3:2), set per language |
+
+Both are PNG without alpha. They're reviewed with the version, so upload them before **Submit for Review**, and check them with **Preview**. They show only on iOS 27 and later. Older versions keep showing screenshots in Search.
+
 ## Export compliance
 
 Already answered in the build: `ITSAppUsesNonExemptEncryption = NO`, since the app uses only HTTPS/TLS. App Store Connect won't ask.
