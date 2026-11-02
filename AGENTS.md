@@ -31,7 +31,13 @@ The core on this Mac runs the user's real agents.
 - **Fixtures first:** capture real payloads into `bridge/testdata/` before writing parsing code, and test against them. If a payload shape changes, re-record the fixture rather than editing it by hand.
 - Run the relevant tests and build before calling something done, and report real results, including failures.
 - **Commits:** imperative subject, a body if useful, ending with the agent's `Co-Authored-By:` line. Commits are signed through 1Password. If signing fails, stop and tell the user; never use `--no-gpg-sign` or `-c commit.gpgsign=false`.
-- No pushing, tagging or publishing without being asked.
+- **Every change goes through a pull request.** Never commit, merge or push directly to `main`, not even a fast-forward:
+  1. Work on a branch (or a worktree's branch) cut from an up-to-date `origin/main`.
+  2. When the change is done and tested locally, push the branch and open a PR with `gh pr create`. The PR description says what changed, why, and how it was tested.
+  3. Merge only after CI (`ci.yml`) passes on the PR **and** the user has said to merge. Use `gh pr merge`, then delete the branch.
+  
+  Merging to `main` is a release step: when `ios/` or `appstore/` changed, it uploads to TestFlight and syncs the App Store listing.
+- Pushing a feature branch to open its PR is part of the workflow. Anything else needs the user to ask first: pushing `main`, tagging (including moving `testflight-uploaded` or `appstore-synced`), or publishing.
 
 ## Bridge (Go): `bridge/`
 
