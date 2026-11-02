@@ -231,18 +231,30 @@ struct QuickKeysBar: View {
     ]
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
-                ForEach(Self.keys, id: \.key) { k in
-                    Button(k.label) { press([k.key], "Pressed \(k.label)") }
-                        .font(.system(.callout, design: .monospaced))
-                        .buttonStyle(.bordered)
-                        .buttonBorderShape(.roundedRectangle(radius: 8))
-                        .tint(k.key == "ctrl+c" ? .red : .primary)
-                }
+        // Full size if the row fits, smaller buttons if not (narrow detail
+        // columns, like the unfolded iPhone Duo), and scrolling as a last resort.
+        ViewThatFits(in: .horizontal) {
+            row(spacing: 6)
+            row(spacing: 4).controlSize(.small)
+            ScrollView(.horizontal, showsIndicators: false) {
+                row(spacing: 4).controlSize(.small)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .disabled(disabled)
+    }
+
+    private func row(spacing: CGFloat) -> some View {
+        HStack(spacing: spacing) {
+            ForEach(Self.keys, id: \.key) { k in
+                Button(k.label) { press([k.key], "Pressed \(k.label)") }
+                    .font(.system(.callout, design: .monospaced))
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.roundedRectangle(radius: 8))
+                    .tint(k.key == "ctrl+c" ? .red : .primary)
+            }
+        }
+        .fixedSize(horizontal: true, vertical: false)
     }
 }
 

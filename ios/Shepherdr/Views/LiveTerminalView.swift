@@ -14,6 +14,8 @@ struct LiveTerminalView: View {
 
     var body: some View {
         TerminalHost(session: session, fontSize: fontSize)
+            // Keeps text off the edge, which matters next to the sidebar on wide screens.
+            .padding(.horizontal, 6)
             .ignoresSafeArea(.keyboard, edges: [])
             .background(Color.black)
             .overlay(alignment: .top) { banner }
