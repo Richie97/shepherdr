@@ -120,7 +120,7 @@ frame("03-blocked", gradient: sunset) { _ in
 }
 
 frame("04-live-terminal", gradient: dusk) { _ in
-    caption("A real terminal\nin your pocket", "Full color, live, keyboard included.")
+    caption(iPad ? "A real terminal in\nyour very large pocket" : "A real terminal\nin your pocket", "Full color, live, keyboard included.")
     phone("3-live.png")
 }
 
