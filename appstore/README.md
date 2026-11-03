@@ -3,7 +3,8 @@
 - `metadata/`: the listing text, one file per field. Pushed to App Store Connect automatically when it changes on main.
 - `metadata.md`: which file is which field, plus the parts that stay manual (age rating, privacy answers, review notes).
 - `screenshots/`: 6.9" iPhone screenshots (1320×2868) with captions. Also synced; their order follows the file names.
-- `make-screenshots.swift`: frames raw simulator screenshots into those images.
+- `screenshots-ipad/`: 13" iPad screenshots (2048×2732), the same five frames. Synced the same way.
+- `make-screenshots.swift`: frames raw simulator screenshots into those images (`ipad` as a 4th argument for the iPad set).
 - `creative/`: the iOS 27 product page header (`header.png`, 3840×1646) and search results image (`search.png`, 3840×2560). Not synced: upload them by hand (see `metadata.md`).
 - `make-creative.swift`: draws those two from the same raw screenshots, with the app icon's sheep redrawn as vectors.
 - App icon: comes from the build, `ios/Shepherdr/Assets.xcassets/AppIcon.appiconset/AppIcon.png` (1024×1024, no alpha).
@@ -30,13 +31,19 @@ cd .. && swift appstore/make-screenshots.swift $RAW ios/Shepherdr/Assets.xcasset
 swift appstore/make-creative.swift $RAW appstore/creative   # header and search results images
 ```
 
+For the iPad set, run the same steps on an **iPad Air 13-inch** simulator (its screenshots are 2048×2732), with two changes: `shot 1-agents -openTerminal t2` (so the detail pane isn't empty), and frame with `ipad` as a 4th argument into `appstore/screenshots-ipad`:
+
+```sh
+swift appstore/make-screenshots.swift $RAW ios/Shepherdr/Assets.xcassets/AppIcon.appiconset/AppIcon.png appstore/screenshots-ipad ipad
+```
+
 The header keeps its text inside Apple's safe area (x 1097–2743, y 493–1154), and the search image keeps the phones inside its own (x 836–3004, y 765–1795). Everything outside those areas is scenery that may be cropped.
 
 Captions and colors are at the bottom of `make-screenshots.swift`. The demo data is in `ios/Shepherdr/Views/DemoData.swift`.
 
 ## Syncing to App Store Connect
 
-`ios/scripts/appstore_sync.py` pushes `metadata/` and `screenshots/` to App Store Connect. It runs in the TestFlight workflow when these change on main, or on a manual run. To run it locally, use the same API key as TestFlight:
+`ios/scripts/appstore_sync.py` pushes `metadata/`, `screenshots/` and `screenshots-ipad/` to App Store Connect. It runs in the TestFlight workflow when these change on main, or on a manual run. To run it locally, use the same API key as TestFlight:
 
 ```sh
 python3 ios/scripts/appstore_sync.py --check          # offline: lengths, screenshot sizes

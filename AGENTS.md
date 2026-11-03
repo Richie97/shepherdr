@@ -92,6 +92,7 @@ The core on this Mac runs the user's real agents.
 - 2026-11-01: The notification Approve button presses `1` for claude-code, `y` for codex and Enter for anything else; Deny presses Esc. Both require an unlocked phone, and both re-check that the agent is still blocked first.
 - 2026-11-01: The phone finds the hub by scanning a QR code once.
 - 2026-11-01: The app is named **Shepherdr**: bundle ID `app.shepherdr`, URL scheme `shepherdr://`, Xcode target and scheme `Shepherdr`. The repo, `herdr-bridge` and the Go module keep their names. Renaming changed the APNs topic (simrig's `apns.json`); old device tokens get dropped automatically (DeviceTokenNotForTopic). Machines come from the core's machine list, and the bridge suggests tailnet peers that aren't added yet.
+- 2026-11-02: The app supports iPad (`TARGETED_DEVICE_FAMILY "1,2"`, all four orientations for multitasking), using the same regular-width split as the unfolded Duo. Once a version with iPad support is released it can't be dropped. The store listing carries 13" iPad screenshots in `appstore/screenshots-ipad/`.
 - 2026-11-02: Send with an empty composer accepts the agent's suggestion: Tab, a 300 ms pause, then Enter, as two `terminal.keys` calls. One call can deliver them 1 ms apart. It asks for confirmation when the agent is blocked, like any send.
 
 ## Status
