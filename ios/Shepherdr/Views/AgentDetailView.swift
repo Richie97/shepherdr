@@ -244,28 +244,34 @@ struct QuickKeysBar: View {
     var disabled: Bool
     var press: (_ keys: [String], _ label: String) -> Void
 
-    private static let keys: [(label: String, key: String)] = [
-        ("esc", "esc"), ("⏎", "enter"), ("↑", "up"), ("↓", "down"), ("tab", "tab"),
-        ("1", "1"), ("2", "2"), ("3", "3"), ("y", "y"), ("n", "n"), ("^C", "ctrl+c"),
-    ]
+    private typealias Key = (label: String, key: String)
+    /// Moving around a dialog, then answering it.
+    private static let navigation: [Key] = [("esc", "esc"), ("⏎", "enter"), ("↑", "up"), ("↓", "down"), ("tab", "tab")]
+    private static let answers: [Key] = [("1", "1"), ("2", "2"), ("3", "3"), ("y", "y"), ("n", "n"), ("^C", "ctrl+c")]
 
     var body: some View {
-        // Full size if the row fits, smaller buttons if not (narrow detail
-        // columns, like the unfolded iPhone Duo), and scrolling as a last resort.
+        // Full size if one row fits, smaller buttons if not (narrow detail
+        // columns), two rows on the narrowest screens (the folded iPhone Duo's
+        // outer screen), and scrolling as a last resort.
         ViewThatFits(in: .horizontal) {
-            row(spacing: 6)
-            row(spacing: 4).controlSize(.small)
+            row(Self.navigation + Self.answers, spacing: 6)
+            row(Self.navigation + Self.answers, spacing: 4).controlSize(.small)
+            VStack(alignment: .leading, spacing: 4) {
+                row(Self.navigation, spacing: 4)
+                row(Self.answers, spacing: 4)
+            }
+            .controlSize(.small)
             ScrollView(.horizontal, showsIndicators: false) {
-                row(spacing: 4).controlSize(.small)
+                row(Self.navigation + Self.answers, spacing: 4).controlSize(.small)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .disabled(disabled)
     }
 
-    private func row(spacing: CGFloat) -> some View {
+    private func row(_ keys: [Key], spacing: CGFloat) -> some View {
         HStack(spacing: spacing) {
-            ForEach(Self.keys, id: \.key) { k in
+            ForEach(keys, id: \.key) { k in
                 Button(k.label) { press([k.key], "Pressed \(k.label)") }
                     .font(.system(.callout, design: .monospaced))
                     .buttonStyle(.bordered)
