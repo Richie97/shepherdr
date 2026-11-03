@@ -1,7 +1,8 @@
-// Frames raw 6.9" simulator screenshots (1320x2868) into App Store images
-// with a caption, plus a lock-screen notification frame.
+// Frames raw simulator screenshots into App Store images with a caption,
+// plus a lock-screen notification frame. iPhone: 6.9" (1320x2868). With
+// `ipad`: 13" iPad (2048x2732), from an iPad Air 13-inch simulator.
 //
-//   swift appstore/make-screenshots.swift <raw-dir> <icon.png> <out-dir>
+//   swift appstore/make-screenshots.swift <raw-dir> <icon.png> <out-dir> [ipad]
 //
 // <raw-dir> holds 1-agents.png, 2-blocked.png, 3-live.png, 4-new.png, taken
 // in demo mode (see appstore/README.md).
@@ -9,7 +10,8 @@ import AppKit
 
 let args = CommandLine.arguments
 let raw = args[1], iconPath = args[2], outDir = args[3]
-let W = 1320, H = 2868
+let iPad = args.count > 4 && args[4] == "ipad"
+let W = iPad ? 2048 : 1320, H = iPad ? 2732 : 2868
 
 func color(_ h: UInt32, _ a: CGFloat = 1) -> NSColor {
     NSColor(srgbRed: CGFloat((h >> 16) & 255) / 255, green: CGFloat((h >> 8) & 255) / 255, blue: CGFloat(h & 255) / 255, alpha: a)
@@ -51,12 +53,13 @@ func caption(_ title: String, _ sub: String) {
     draw(sub, font: rounded(50, .medium), color: color(0xFFFFFF, 0.82), in: NSRect(x: 100, y: 440, width: W - 200, height: 140))
 }
 
-/// The screenshot as a phone: rounded, outlined, shadowed, bleeding off the bottom.
-func phone(_ file: String, top: CGFloat = 640, width: CGFloat = 1060) {
+/// The screenshot as a device: rounded, outlined, shadowed, bleeding off the bottom.
+func phone(_ file: String, top: CGFloat = 640) {
     let img = NSImage(contentsOfFile: "\(raw)/\(file)")!
+    let width: CGFloat = iPad ? 1720 : 1060, radius: CGFloat = iPad ? 60 : 92
     let h = width * CGFloat(H) / CGFloat(W)
     let r = NSRect(x: (CGFloat(W) - width) / 2, y: top, width: width, height: h)
-    let path = NSBezierPath(roundedRect: r, xRadius: 92, yRadius: 92)
+    let path = NSBezierPath(roundedRect: r, xRadius: radius, yRadius: radius)
     NSGraphicsContext.saveGraphicsState()
     let shadow = NSShadow(); shadow.shadowColor = color(0x000000, 0.45); shadow.shadowBlurRadius = 60; shadow.shadowOffset = NSSize(width: 0, height: -20)
     shadow.set(); color(0x000000).setFill(); path.fill()
@@ -83,7 +86,9 @@ frame("02-notifications", gradient: dawn) { _ in
     draw("Sunday, November 1", font: rounded(52, .medium), color: color(0xFFFFFF, 0.85), in: NSRect(x: 0, y: 660, width: W, height: 70))
     let icon = NSImage(contentsOfFile: iconPath)!
     func card(y: CGFloat, title: String, sub: String, body: String, ago: String, height: CGFloat = 250) -> NSRect {
-        let r = NSRect(x: 90, y: y, width: CGFloat(W) - 180, height: height)
+        // iPad notifications stay phone-width, centered.
+        let w = min(CGFloat(W) - 180, 1300)
+        let r = NSRect(x: (CGFloat(W) - w) / 2, y: y, width: w, height: height)
         let p = NSBezierPath(roundedRect: r, xRadius: 56, yRadius: 56)
         color(0xFFFFFF, 0.22).setFill(); p.fill()
         let ir = NSRect(x: r.minX + 40, y: r.minY + 44, width: 110, height: 110)
@@ -115,7 +120,7 @@ frame("03-blocked", gradient: sunset) { _ in
 }
 
 frame("04-live-terminal", gradient: dusk) { _ in
-    caption("A real terminal\nin your pocket", "Full color, live, keyboard included.")
+    caption(iPad ? "A real terminal in\nyour very large pocket" : "A real terminal\nin your pocket", "Full color, live, keyboard included.")
     phone("3-live.png")
 }
 

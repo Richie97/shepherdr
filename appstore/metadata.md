@@ -14,6 +14,7 @@
 | Copyright | `metadata/copyright.txt` |
 | Categories | `metadata/primary_category.txt`, `secondary_category.txt` (App Store Connect IDs, like `DEVELOPER_TOOLS`) |
 | Screenshots (6.9") | `screenshots/*.png`, uploaded in file-name order, replaced only when they change |
+| Screenshots (13" iPad) | `screenshots-ipad/*.png`, the same way |
 | Version | `MARKETING_VERSION` in `ios/project.yml`. The sync creates that version, or renames the one being prepared |
 
 Notes on the text: words from the name and subtitle are indexed already, so keywords don't repeat them. No third-party trademarks in keywords (App Review guideline 2.3.7). The app icon comes from the build.

@@ -4,6 +4,7 @@
   appstore/metadata/en-US/*.txt   listing text, one file per field
   appstore/metadata/*.txt         copyright and categories
   appstore/screenshots/*.png      6.9" iPhone screenshots, uploaded in name order
+  appstore/screenshots-ipad/*.png 13" iPad screenshots, the same way
 
 What it does, all idempotent:
   - App Information: name, subtitle, privacy policy URL, categories
@@ -34,10 +35,12 @@ from testflight_distribute import ASC, put_part, q  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 META = os.path.join(ROOT, "appstore", "metadata")
-SHOTS = os.path.join(ROOT, "appstore", "screenshots")
 LOCALE = "en-US"
-DISPLAY_TYPE = "APP_IPHONE_67"  # the 6.9" slot; 1320x2868 fits it
-SHOT_SIZES = {(1320, 2868), (1290, 2796), (1260, 2736)}
+# One screenshot set per device slot: (folder, App Store display type, accepted sizes, name).
+SHOT_SETS = [
+    ("screenshots", "APP_IPHONE_67", {(1320, 2868), (1290, 2796), (1260, 2736)}, '6.9" iPhone'),
+    ("screenshots-ipad", "APP_IPAD_PRO_3GEN_129", {(2048, 2732), (2064, 2752)}, '13" iPad'),
+]
 
 LIMITS = {"name": 30, "subtitle": 30, "promotional_text": 170, "description": 4000,
           "keywords": 100, "release_notes": 4000, "beta_description": 4000}
@@ -63,8 +66,9 @@ def marketing_version() -> str:
     return m.group(1)
 
 
-def screenshots() -> list:
-    return sorted(os.path.join(SHOTS, f) for f in os.listdir(SHOTS) if f.lower().endswith(".png"))
+def screenshots(folder) -> list:
+    d = os.path.join(ROOT, "appstore", folder)
+    return sorted(os.path.join(d, f) for f in os.listdir(d) if f.lower().endswith(".png"))
 
 
 def png_info(path):
@@ -92,20 +96,23 @@ def check() -> dict:
             problems.append(f"{k}: {len(t[k])} characters (limit {limit})")
     if "keywords" in t and len(t["keywords"].encode()) > 100:
         problems.append("keywords: over 100 bytes")
-    shots = screenshots()
-    if not 1 <= len(shots) <= 10:
-        problems.append(f"{len(shots)} screenshots (need 1-10)")
-    for s in shots:
-        w, h, color = png_info(s)
-        if (w, h) not in SHOT_SIZES:
-            problems.append(f"{os.path.basename(s)}: {w}x{h} isn't a 6.9\" size")
-        if color in (4, 6):
-            problems.append(f"{os.path.basename(s)}: has an alpha channel")
+    counts = []
+    for folder, _, sizes, device in SHOT_SETS:
+        shots = screenshots(folder)
+        counts.append(f"{len(shots)} {device}")
+        if not 1 <= len(shots) <= 10:
+            problems.append(f"{folder}: {len(shots)} screenshots (need 1-10)")
+        for s in shots:
+            w, h, color = png_info(s)
+            if (w, h) not in sizes:
+                problems.append(f"{folder}/{os.path.basename(s)}: {w}x{h} isn't a {device} size")
+            if color in (4, 6):
+                problems.append(f"{folder}/{os.path.basename(s)}: has an alpha channel")
     for p in problems:
         print(f"problem: {p}")
     if problems:
         raise SystemExit("App Store files need fixing")
-    print(f"listing OK: {len(t)} text fields, {len(shots)} screenshots, version {marketing_version()}")
+    print(f"listing OK: {len(t)} text fields, screenshots: {', '.join(counts)}, version {marketing_version()}")
     return t
 
 
@@ -182,20 +189,20 @@ def sync_version(asc, app_id, t):
     return loc
 
 
-def sync_screenshots(asc, loc):
-    files = screenshots()
+def sync_screenshots(asc, loc, folder, display_type, device):
+    files = screenshots(folder)
     sets = asc.call("GET", f"/v1/appStoreVersionLocalizations/{loc['id']}/appScreenshotSets")["data"]
-    sset = next((s for s in sets if s["attributes"]["screenshotDisplayType"] == DISPLAY_TYPE), None)
+    sset = next((s for s in sets if s["attributes"]["screenshotDisplayType"] == display_type), None)
     if not sset:
         sset = asc.call("POST", "/v1/appScreenshotSets", {"data": {"type": "appScreenshotSets",
-                        "attributes": {"screenshotDisplayType": DISPLAY_TYPE},
+                        "attributes": {"screenshotDisplayType": display_type},
                         "relationships": {"appStoreVersionLocalization": {"data": {
                             "type": "appStoreVersionLocalizations", "id": loc["id"]}}}}})["data"]
     existing = asc.call("GET", f"/v1/appScreenshotSets/{sset['id']}/appScreenshots")["data"]
     want = [md5(f) for f in files]
     have = [s["attributes"].get("sourceFileChecksum") for s in existing]
     if have == want:
-        print(f"screenshots: {len(files)} already up to date")
+        print(f"{device} screenshots: {len(files)} already up to date")
         return
     for s in existing:
         asc.call("DELETE", f"/v1/appScreenshots/{s['id']}")
@@ -223,7 +230,7 @@ def sync_screenshots(asc, loc):
             print(f"  screenshot {sid} still processing; it'll finish on Apple's side")
     asc.call("PATCH", f"/v1/appScreenshotSets/{sset['id']}/relationships/appScreenshots",
              {"data": [{"type": "appScreenshots", "id": i} for i in ids]})
-    print(f"screenshots: replaced {len(existing)} with {len(ids)}, in file-name order")
+    print(f"{device} screenshots: replaced {len(existing)} with {len(ids)}, in file-name order")
 
 
 def sync_beta(asc, app_id, t):
@@ -254,7 +261,8 @@ def main():
     sync_app_info(asc, app_id, t)
     loc = sync_version(asc, app_id, t)
     if loc:
-        sync_screenshots(asc, loc)
+        for folder, display_type, _, device in SHOT_SETS:
+            sync_screenshots(asc, loc, folder, display_type, device)
     sync_beta(asc, app_id, t)
     print("App Store listing synced. Submitting for review stays manual.")
 
