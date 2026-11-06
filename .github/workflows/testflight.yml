@@ -86,7 +86,7 @@ jobs:
     name: Archive and upload
     needs: gate
     if: needs.gate.outputs.upload == 'true'
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
@@ -95,6 +95,12 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
+      - name: Require the iOS 27 SDK (the iPhone Duo letterboxes older builds)
+        run: |
+          xcodebuild -version
+          sdk=$(xcrun --sdk iphoneos --show-sdk-version)
+          echo "iOS SDK $sdk"
+          [[ "${sdk%%.*}" -ge 27 ]] || { echo "::error::iOS SDK $sdk is older than 27"; exit 1; }
       - run: brew install xcodegen
       - name: Write API key
         env:

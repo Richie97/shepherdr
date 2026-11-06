@@ -29,7 +29,7 @@ jobs:
 
   ios:
     name: iOS app
-    runs-on: macos-26
+    runs-on: xcode-27
     defaults:
       run:
         working-directory: ios
