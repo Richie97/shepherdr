@@ -65,7 +65,7 @@ func main() {
 	}
 }
 
-func serve(args []string) error {
+func serve(args []string) (err error) {
 	fs := flag.NewFlagSet("serve", flag.ExitOnError)
 	listen := fs.String("listen", defaultListen, "address to listen on; must be loopback")
 	transport := fs.String("transport", "auto", "how to reach herdr-core: socket, hc (`hc connect`), or auto (hc on Windows, socket elsewhere)")
@@ -86,6 +86,13 @@ func serve(args []string) error {
 		out = f
 	}
 	log := slog.New(slog.NewTextHandler(out, nil))
+	// Started at logon or by the watchdog task, stderr goes nowhere: put the
+	// reason the bridge stopped in the log.
+	defer func() {
+		if err != nil {
+			log.Error("herdr-bridge exiting", "err", err)
+		}
+	}()
 
 	client := &core.Client{}
 	if *transport == "auto" {
@@ -119,9 +126,7 @@ func serve(args []string) error {
 	}
 
 	if !*noAuth && *owner == "" {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		st, err := tailnet.GetStatus(ctx)
-		cancel()
+		st, err := waitForTailnet(log, 2*time.Minute)
 		if err != nil {
 			return fmt.Errorf("detect owner (pass -owner to skip): %w", err)
 		}
@@ -185,9 +190,27 @@ var plistTmpl = template.Must(template.New("plist").Parse(`<?xml version="1.0" e
 </plist>
 `))
 
+// waitForTailnet reads Tailscale's status, retrying for up to max. Right
+// after logon or boot Tailscale may not be up yet.
+func waitForTailnet(log *slog.Logger, max time.Duration) (*tailnet.Status, error) {
+	deadline := time.Now().Add(max)
+	for i := 0; ; i++ {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		st, err := tailnet.GetStatus(ctx)
+		cancel()
+		if err == nil || time.Now().After(deadline) {
+			return st, err
+		}
+		if i == 0 {
+			log.Warn("waiting for Tailscale", "err", err)
+		}
+		time.Sleep(5 * time.Second)
+	}
+}
+
 // install makes `herdr-bridge serve` start automatically and publishes it to
 // the tailnet with `tailscale serve`: a launchd agent on macOS, a
-// per-user Run key on Windows (no admin needed).
+// per-user watchdog task on Windows (no admin needed).
 func install(args []string) error {
 	fs := flag.NewFlagSet("install", flag.ExitOnError)
 	dryRun := fs.Bool("dry-run", false, "print what would be done without doing it")
@@ -302,10 +325,13 @@ func installLaunchd(bin string, dryRun bool) error {
 	return nil
 }
 
-const windowsRunKey = `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
+const (
+	windowsRunKey = `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
+	startTaskName = "herdr-bridge"
+)
 
 func installWindows(bin string, dryRun bool) error {
-	// Always install to one place, so the Run key never changes. Upgrade by
+	// Always install to one place, so the task never changes. Upgrade by
 	// uploading a new build under another name (herdr-bridge.new.exe) and
 	// running its install: a running .exe can't be overwritten, so stop it
 	// first, then copy this binary over it.
@@ -316,30 +342,30 @@ func installWindows(bin string, dryRun bool) error {
 	target := filepath.Join(local, "Programs", "herdr-bridge", "herdr-bridge.exe")
 	logPath := filepath.Join(filepath.Dir(target), "herdr-bridge.log")
 	serveArgs := []string{"serve", "-log", logPath}
-	command := fmt.Sprintf(`"%s" serve -log "%s"`, target, logPath)
-	reg := []string{"reg", "add", windowsRunKey, "/v", "herdr-bridge", "/t", "REG_SZ", "/d", command, "/f"}
 	kill := []string{"taskkill", "/F", "/IM", "herdr-bridge.exe", "/FI", fmt.Sprintf("PID ne %d", os.Getpid())}
+	// Older installs started at logon from the Run key; the task replaces it.
+	unreg := []string{"reg", "delete", windowsRunKey, "/v", "herdr-bridge", "/f"}
 
+	fmt.Println("pause task", startTaskName)
 	fmt.Println("run  ", kill)
 	if !strings.EqualFold(bin, target) {
 		fmt.Printf("copy %s -> %s\n", bin, target)
 	}
-	fmt.Println("run  ", reg)
-	fmt.Printf("start %s %v via Task Scheduler\n", target, serveArgs)
+	fmt.Println("run  ", unreg)
+	fmt.Printf("install task %s: runs %s %v every minute unless already running\n", startTaskName, target, serveArgs)
 	if dryRun {
 		return nil
 	}
 
+	pauseTask()                              // or it restarts the old binary mid-copy
 	exec.Command(kill[0], kill[1:]...).Run() // fails harmlessly when none is running
 	if !strings.EqualFold(bin, target) {
 		if err := copyFile(bin, target); err != nil {
 			return err
 		}
 	}
-	if out, err := exec.Command(reg[0], reg[1:]...).CombinedOutput(); err != nil {
-		return fmt.Errorf("%v: %w\n%s", reg, err, out)
-	}
-	return startDetached(target, serveArgs)
+	exec.Command(unreg[0], unreg[1:]...).Run() // fails harmlessly when absent
+	return installTask(target, serveArgs)
 }
 
 // copyFile copies src to dst, retrying briefly while a killed process
