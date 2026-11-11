@@ -72,7 +72,7 @@ go build -trimpath -ldflags "-s -w -H=windowsgui" -o herdr-bridge.new.exe .\cmd\
 bridge/scripts/deploy-windows.sh <machine-name>    # as listed by `hc machine ls`
 ```
 
-Either way, the bridge ends up in `%LOCALAPPDATA%\Programs\herdr-bridge\` with its log beside it. It starts at every logon from your user's Run key, so no admin rights are needed, and it reaches Herdr through `hc connect`. Run the same command again to upgrade.
+Either way, the bridge ends up in `%LOCALAPPDATA%\Programs\herdr-bridge\` with its log beside it. A Task Scheduler task named `herdr-bridge`, owned by your user, starts it after logon and restarts it within a minute if it stops. No admin rights are needed, and it reaches Herdr through `hc connect`. Run the same command again to upgrade.
 
 ### 3c. Linux hub
 
@@ -218,7 +218,7 @@ Apps installed from Xcode use Apple's development push service. The app tells th
 | Agents from another machine missing | The hub's core hasn't added that machine (`hc machine ls`), or it's asleep. |
 | "<machine> is unavailable" / "needs login" | The hub's ssh to that machine wanted an interactive login. With Tailscale SSH this usually means the rule uses `"action": "check"`, which re-asks every ~12 h. Switch that rule to `"accept"`, or use regular sshd with a key. The bridge retries such machines every 1–15 minutes, and the app has a **Reconnect** button. |
 | No notifications | Check `"push_enabled"` in `/v1/health`, then Settings → **Send test notification**, which reports Apple's error. `DeviceTokenNotForTopic` means `topic` ≠ the bundle ID. |
-| Windows bridge not running after reboot | It starts at **logon**, so someone has to sign in to Windows. The log is `%LOCALAPPDATA%\Programs\herdr-bridge\herdr-bridge.log`. |
+| Windows bridge not running after reboot | It starts after **logon**, so someone has to sign in to Windows; then the `herdr-bridge` task starts it within a minute. If it keeps stopping, the log at `%LOCALAPPDATA%\Programs\herdr-bridge\herdr-bridge.log` ends with `herdr-bridge exiting` and the reason. `schtasks /Query /TN herdr-bridge /V` shows the task. |
 | Can't replace the bridge on Windows | A running `.exe` can't be overwritten. Always install from `herdr-bridge.new.exe`; the deploy script does this for you. |
 
 ## Uninstall
